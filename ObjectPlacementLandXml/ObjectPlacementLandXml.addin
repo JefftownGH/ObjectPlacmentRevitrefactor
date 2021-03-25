@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command ObjectPlacementLandXml</Text>
+    <Description>Some description for ObjectPlacementLandXml</Description>
+    <Assembly>ObjectPlacementLandXml.dll</Assembly>
+    <FullClassName>ObjectPlacementLandXml.Command</FullClassName>
+    <ClientId>f59cb998-4222-4690-b45b-79e1f8540270</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application ObjectPlacementLandXml</Name>
+    <Assembly>ObjectPlacementLandXml.dll</Assembly>
+    <FullClassName>ObjectPlacementLandXml.App</FullClassName>
+    <ClientId>3217f836-c681-4744-b757-f4b60c477a84</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
