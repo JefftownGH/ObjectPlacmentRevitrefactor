@@ -138,58 +138,63 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentElement is IrregularLine)
             {
                 Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint(), this.GetEndPoint());
-                Point = L.Evaluate(StationToStudy - this.GetStartPoint().X, false);
+                Point = L.Evaluate(StationToStudy - Station, false);
             }
             if (this.AlignmentElement is Curve)
             {
-                //Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                //Point = HS.Evaluate(StationToStudy - this.GetStartPoint().X, false);
 
-                using (Transaction se = new Transaction(ObjectPlacement.uiDoc.Document, "New Tra"))
-                {
-                    se.Start();
+                var StartPoint = this.GetStartPoint();
+                var EndPoint = this.GetEndPoint();
+                var Radius = this.GetCurveRadius();
 
-                    //Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                    //var Normal = HS.Normal;
-                    ////var PlaneForNormal = Plane.CreateByThreePoints(RevitPlacmenElement.ConvertPointToInternal(this.GetStartPoint()), RevitPlacmenElement.ConvertPointToInternal(this.GetEndPoint()), RevitPlacmenElement.ConvertPointToInternal(this.GetPointPI()));
-                    //var CurveCenter = RevitPlacmenElement.ConvertPointToInternal(this.GetPointAtCurveCenter());
-                    //var Radius = RevitPlacmenElement.ConvertDoubleToInternal(this.GetCurveRadius());
-                    //var StartAngle = RevitPlacmenElement.ConvertAngleToInternal(this.GetCurveStartAngle());
-                    //var EndAngle = RevitPlacmenElement.ConvertAngleToInternal(this.GetCurveEndAngle());
+                Arc C = CreateArc(StartPoint, EndPoint, Radius, (bool)false);
+               // ObjectPlacement.uiDoc.Document.Create.NewDetailCurve(ObjectPlacement.uiDoc.Document.ActiveView, C);
+               
 
-                    var StartPoint = RevitPlacmenElement.ConvertPointToInternal(this.GetStartPoint());
-                    var EndPoint = RevitPlacmenElement.ConvertPointToInternal(this.GetEndPoint());
-                    var Radius = RevitPlacmenElement.ConvertDoubleToInternal(this.GetCurveRadius());
+                //var StationToStudy2 = StationToStudy - Station;
+                //if (StationToStudy < 0)
+                //{
 
+                //}
 
-                    //Arc C = null;
-                    //Arc C2 = null;
-                    //if (StartAngle < EndAngle)
-                    //{
-                    //    C = Arc.Create(CurveCenter, Radius, StartAngle, EndAngle, HS.XDirection.Normalize(), HS.YDirection.Normalize());
-                    //    C2 = Arc.Create(CurveCenter, Radius,Math.PI- StartAngle, Math.PI - EndAngle, HS.XDirection.Normalize(), HS.YDirection.Normalize());
+                //Curve Evalute
+                //double param1 = C.GetEndParameter(0);
+                //double param2 = C.GetEndParameter(1);
 
-                    //}
-                    //else
-                    //{
-                    //   // C = Arc.Create(CurveCenter, Radius, Math.PI-StartAngle, EndAngle, HS.XDirection.Normalize(), HS.YDirection.Normalize());
-                    //   // C2 = Arc.Create(CurveCenter, Radius, EndAngle, StartAngle, HS.YDirection.Normalize(), HS.XDirection.Normalize());
-                    //}
-                    //ObjectPlacement.uiDoc.Document.Create.NewDetailCurve(ObjectPlacement.uiDoc.Document.ActiveView, C2);
+                double StationParam = ((StationToStudy - this.Station) / this.GetLength());
 
+                //double paramCalc = param1 + ((param2 - param1) * StationToStudy2 / this.GetLength());
 
-                    Arc C = CreateArc(StartPoint, EndPoint, Radius, (bool)false);
-                    ObjectPlacement.uiDoc.Document.Create.NewDetailCurve(ObjectPlacement.uiDoc.Document.ActiveView, C);
+              
 
-                    se.Commit();
-                }
-                return this.GetStartPoint();
+                XYZ evaluatedPoint = null;
+
+                //if (C.IsInside(paramCalc))
+                //{
+                //double normParam = C.ComputeNormalizedParameter(paramCalc);
+               // double normParam = C.ComputeNormalizedParameter(StationParam);
+
+                evaluatedPoint = C.Evaluate(StationParam, true);
+                //}
+                //else
+                //{
+
+                //}
+
+                //Point = C.Evaluate(StationToStudy - Station, false);
+                //}
+                //else
+                //{
+                //    Point = C.Evaluate(this.EndStation - StationToStudy, false);
+                //}
+
+                return evaluatedPoint;
 
             }
             if (this.AlignmentElement is Spiral)
             {
                 Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                Point = HS.Evaluate(StationToStudy - this.GetStartPoint().X, false);
+                Point = HS.Evaluate(StationToStudy - Station, false);
                 return this.GetStartPoint();
 
                 //using (Transaction se = new Transaction(ObjectPlacement.uiDoc.Document, "New Tra"))
@@ -219,11 +224,11 @@ namespace ObjectPlacementLandXml
             XYZ v = null;
             if (!(bool)this.GetArcRotationAntiClockWise())
             {
-                 v = PointEnd - PointStart;
+                v = PointEnd - PointStart;
             }
             else
             {
-                 v = PointStart - PointEnd;
+                v = PointStart - PointEnd;
             }
             double d = 0.5 * v.GetLength(); // half chord length
 

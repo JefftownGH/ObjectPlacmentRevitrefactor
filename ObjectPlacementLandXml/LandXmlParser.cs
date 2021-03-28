@@ -67,6 +67,8 @@ namespace ObjectPlacementLandXml
                     {
                         RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetEndPoint(), Station));
                         StationsToStudy.Remove(Station);
+                        continue;
+
                     }
                     else if (Station > LandXmlObject.Station && Station < (LandXmlObject.Station + LandXmlObject.GetLength()))
                     {
