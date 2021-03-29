@@ -14,15 +14,17 @@ namespace ObjectPlacementLandXml
     [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand
     {
+        public static UIApplication uiapp;
+        public static UIDocument uidoc;
         public Result Execute( ExternalCommandData commandData,ref string message, ElementSet elements)
         {
 
-            UIApplication uiapp = commandData.Application;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
+            uiapp = commandData.Application;
+            uidoc = uiapp.ActiveUIDocument;
             Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            ObjectPlacement T = new ObjectPlacement(uidoc);
+            ObjectPlacement T = new ObjectPlacement();
             T.ShowDialog();
 
             return Result.Succeeded;

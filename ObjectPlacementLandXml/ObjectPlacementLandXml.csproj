@@ -65,6 +65,10 @@
     <Compile Include="ObjectPlacement.xaml.cs">
       <DependentUpon>ObjectPlacement.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ParameterElement.cs" />
+    <Compile Include="ParameterValues.xaml.cs">
+      <DependentUpon>ParameterValues.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RevitHelper.cs" />
     <Compile Include="RevitPlacmenElement.cs" />
@@ -75,6 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="ObjectPlacement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ParameterValues.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

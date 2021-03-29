@@ -52,33 +52,37 @@ namespace ObjectPlacementLandXml
         {
             var StationsToStudy = Stations.Distinct().ToList();
             StationsToStudy.Sort();
+
             foreach (var LandXmlObject in LandXmlAlignmentObjects)
             {
                 for (int i = 0; i < StationsToStudy.Count; i++)
                 {
-                    var Station = StationsToStudy[0];
+                    var Station = StationsToStudy[i];
                     if (Station == LandXmlObject.Station)
                     {
                         RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetStartPoint(), Station));
-                        StationsToStudy.Remove(Station);
+                        //StationsToStudy.Remove(Station);
                         continue;
                     }
                     else if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()))
                     {
                         RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetEndPoint(), Station));
-                        StationsToStudy.Remove(Station);
+                        //StationsToStudy.Remove(Station);
+
                         continue;
 
                     }
                     else if (Station > LandXmlObject.Station && Station < (LandXmlObject.Station + LandXmlObject.GetLength()))
                     {
                         var PointAtStatation = LandXmlObject.GetPointAtStation(Station);
-                        RevitPlacementPoint.Add(new RevitPlacmenElement(PointAtStatation, Station));
-                        StationsToStudy.Remove(Station);
+                        RevitPlacementPoint.Add(PointAtStatation);
+                        //StationsToStudy.Remove(Station);
+
                         continue;
                     }
                     else
                     {
+                        //StationsToStudy.Remove(Station);
                         continue;
                     }
                 }

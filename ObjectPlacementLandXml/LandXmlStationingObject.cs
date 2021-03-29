@@ -13,6 +13,7 @@ namespace ObjectPlacementLandXml
         public double Station { get; set; }
         public double EndStation { get; set; }
         public object AlignmentElement { get; set; }
+        public object RevitElement { get; set; }
 
         public LandXmlStationingObject(double station, object alignmentElement)
         {
@@ -20,7 +21,48 @@ namespace ObjectPlacementLandXml
             AlignmentElement = alignmentElement;
             EndStation = station + this.GetLength();
 
+            CreateRevitElement();
         }
+
+        private void CreateRevitElement()
+        {
+            if (this.AlignmentElement is Line)
+            {
+                Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint(), this.GetEndPoint());
+                RevitElement = L;
+            }
+            if (this.AlignmentElement is IrregularLine)
+            {
+                Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint(), this.GetEndPoint());
+                RevitElement = L;
+
+            }
+            if (this.AlignmentElement is Curve)
+            {
+                var StartPoint = this.GetStartPoint();
+                var EndPoint = this.GetEndPoint();
+                var Radius = this.GetCurveRadius();
+
+                Arc C = CreateArc(StartPoint, EndPoint, Radius, (bool)false);
+                RevitElement = C;
+
+            }
+            if (this.AlignmentElement is Spiral)
+            {
+                //PolyLine P = PolyLine.Create()
+                Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
+                RevitElement = HS;
+
+
+            }
+            if (this.AlignmentElement is Chain)
+            {
+                //Review 
+                //return ExtractPoint((this.AlignmentElement as Chain).Text);
+            }
+
+        }
+
         public XYZ GetStartPoint()
         {
             XYZ StartPoint = null;
@@ -46,7 +88,7 @@ namespace ObjectPlacementLandXml
                 //Review 
                 StartPoint = ExtractPoint((this.AlignmentElement as Chain).Text);
             }
-            ExtractHeightForPoint(StartPoint);
+            ExtractHeightForPoint(new RevitPlacmenElement (StartPoint,Station));
 
             return StartPoint;
         }
@@ -77,7 +119,7 @@ namespace ObjectPlacementLandXml
                 EndPoint = ExtractPoint((this.AlignmentElement as Chain).Text);
             }
 
-            ExtractHeightForPoint(EndPoint);
+            ExtractHeightForPoint(new RevitPlacmenElement(EndPoint,Station));
 
             return EndPoint;
         }
@@ -127,85 +169,46 @@ namespace ObjectPlacementLandXml
             XYZ PointStart = new XYZ(Y, X, 0);
             return PointStart;
         }
-        public XYZ GetPointAtStation(double StationToStudy)
+        public RevitPlacmenElement GetPointAtStation(double StationToStudy)
         {
-            XYZ Point = null;
+            RevitPlacmenElement PointElement = null;
             if (this.AlignmentElement is Line)
             {
-                Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint(), this.GetEndPoint());
-                Point = L.Evaluate(StationToStudy - Station, false);
+                XYZ Point  = (this.RevitElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
+                PointElement = new RevitPlacmenElement(Point ,StationToStudy);
+
             }
             if (this.AlignmentElement is IrregularLine)
             {
-                Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint(), this.GetEndPoint());
-                Point = L.Evaluate(StationToStudy - Station, false);
+                XYZ Point  = (this.RevitElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
+                PointElement = new RevitPlacmenElement(Point ,StationToStudy);
+
             }
             if (this.AlignmentElement is Curve)
             {
-
-                var StartPoint = this.GetStartPoint();
-                var EndPoint = this.GetEndPoint();
-                var Radius = this.GetCurveRadius();
-
-                Arc C = CreateArc(StartPoint, EndPoint, Radius, (bool)false);
-               // ObjectPlacement.uiDoc.Document.Create.NewDetailCurve(ObjectPlacement.uiDoc.Document.ActiveView, C);
+                double StationParam; 
                
-
-                //var StationToStudy2 = StationToStudy - Station;
-                //if (StationToStudy < 0)
-                //{
-
-                //}
-
-                //Curve Evalute
-                //double param1 = C.GetEndParameter(0);
-                //double param2 = C.GetEndParameter(1);
-
-                double StationParam = ((StationToStudy - this.Station) / this.GetLength());
-
-                //double paramCalc = param1 + ((param2 - param1) * StationToStudy2 / this.GetLength());
-
-              
-
-                XYZ evaluatedPoint = null;
-
-                //if (C.IsInside(paramCalc))
-                //{
-                //double normParam = C.ComputeNormalizedParameter(paramCalc);
-               // double normParam = C.ComputeNormalizedParameter(StationParam);
-
-                evaluatedPoint = C.Evaluate(StationParam, true);
-                //}
+                //if ((bool)this.GetArcRotationAntiClockWise())
+                {
+                    StationParam = 1 - (((StationToStudy - this.Station)) / this.GetLength());
+                }
                 //else
                 //{
-
+                //    StationParam = ((StationToStudy - this.Station)/ this.GetLength());
                 //}
 
-                //Point = C.Evaluate(StationToStudy - Station, false);
-                //}
-                //else
-                //{
-                //    Point = C.Evaluate(this.EndStation - StationToStudy, false);
-                //}
-
-                return evaluatedPoint;
+                XYZ Point =  (this.RevitElement as Autodesk.Revit.DB.Arc).Evaluate(StationParam, true);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy);
 
             }
             if (this.AlignmentElement is Spiral)
             {
-                Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                Point = HS.Evaluate(StationToStudy - Station, false);
-                return this.GetStartPoint();
+                //PolyLine P = PolyLine.Create()
+                //Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
+                //Point = HS.Evaluate(StationToStudy - Station, false);
+                XYZ Point = this.GetStartPoint();
+                PointElement = new RevitPlacmenElement(Point, StationToStudy);
 
-                //using (Transaction se = new Transaction(ObjectPlacement.uiDoc.Document, "New Tra"))
-                //{
-                //    se.Start();
-                //    Arc HS2 = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                //    ObjectPlacement.uiDoc.Document.Create.NewDetailCurve(ObjectPlacement.uiDoc.Document.ActiveView, HS2);
-                //    se.Commit();
-                //}
-                //review    
-                //return ExtractPoint((this.AlignmentElement as Spiral).Items[0] as PointType);
             }
             if (this.AlignmentElement is Chain)
             {
@@ -213,8 +216,8 @@ namespace ObjectPlacementLandXml
                 //return ExtractPoint((this.AlignmentElement as Chain).Text);
             }
 
-            ExtractHeightForPoint(Point);
-            return Point;
+            ExtractHeightForPoint(PointElement);
+            return PointElement;
         }
 
         private Arc CreateArc(XYZ PointStart, XYZ PointEnd, double radius, bool largeSagitta)
@@ -248,8 +251,10 @@ namespace ObjectPlacementLandXml
             return Arc.Create(PointEnd, PointStart, midPointArc);
 
         }
-        private void ExtractHeightForPoint(XYZ point)
+        private void ExtractHeightForPoint(RevitPlacmenElement point)
         {
+
+
             //LineX LL = LineX.CreateBound(PointBeforeIt, HeightPoint);
             //XYZ Vector = HeightPoint - PointBeforeIt;
             //var Angle = XYZ.BasisX.AngleTo(Vector) * 180 / Math.PI;
@@ -287,14 +292,7 @@ namespace ObjectPlacementLandXml
             }
             return Length;
         }
-        //public XYZ GetPointonCurve()
-        //{
-        //    if (this.AlignmentElement is Curve)
-        //    {
-        //        return ExtractPoint((this.AlignmentElement as Curve).Items[3] as PointType);
-        //    }
-        //    return null;
-        //}
+
         public XYZ GetPointPI()
         {
             if (this.AlignmentElement is Curve)

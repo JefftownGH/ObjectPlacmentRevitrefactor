@@ -2,7 +2,7 @@
 
 namespace ObjectPlacementLandXml
 {
-    internal class RevitPlacmenElement
+    public class RevitPlacmenElement
     {
         public XYZ PlacementPoint { get; set; }
         public double Station { get; set; }

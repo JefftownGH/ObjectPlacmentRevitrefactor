@@ -20,19 +20,21 @@ namespace ObjectPlacementLandXml
     /// </summary>
     public partial class ObjectPlacement : Window
     {
-        public static UIDocument uiDoc;
-
-        public ObjectPlacement(UIDocument UIDOC)
+        public ObjectPlacement()
         {
             InitializeComponent();
-            uiDoc = UIDOC;
         }
 
         private void Run_click(object sender, RoutedEventArgs e)
         {
             var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace());
-            RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, uiDoc, FamilyPath.Text);
+
+            ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text);
+            W.ShowDialog();
+            //RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, uiDoc, FamilyPath.Text);
             this.Close();
+
+
 
         }
         public double ExtractStationDisntace()
