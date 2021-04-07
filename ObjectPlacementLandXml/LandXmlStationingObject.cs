@@ -101,31 +101,50 @@ namespace ObjectPlacementLandXml
 
             // double SubDivisions = Math.Round((Splength / ObjectPlacement.Stationincrement));
             //Change
-            double SubDivisions = Math.Round((Splength * 10));
+            double SubDivisions = Math.Round((Splength * 20));
             var step = tao / SubDivisions;
 
             List<XYZ> ControlPoints = new List<XYZ>();
+
+          
 
             for (double i = 0.0; i < tao; i = i + step)
             {
                 var x = A * Math.Sqrt(2 * i) * (1 - (Math.Pow(i, 2) / 10) + (Math.Pow(i, 4) / 216));
                 var y = A * Math.Sqrt(2 * i) * ((i / 3) - (Math.Pow(i, 3) / 42) + (Math.Pow(i, 5) / 1320));
-                ControlPoints.Add(new XYZ(x, y, 0));
+
+                //var Point = new XYZ(x, y, 0);           
+                if (Rot == clockwise.ccw)
+                {
+                    var Point = new XYZ(y, x, 0) + EndPoint;
+                    ControlPoints.Add(Point);
+
+                }
+                else
+                {
+                    var Point = new XYZ(y, x, 0) + startPoint;
+                    ControlPoints.Add(Point);
+                }
             }
 
-            List<double> Weights = Enumerable.Repeat(1.0, ControlPoints.Count).ToList();
-            var P = NurbSpline.CreateCurve(ControlPoints, Weights);
+            var V1 = (ControlPoints.Last() - ControlPoints.First()).Normalize();
+            var V2 = (EndPoint - startPoint).Normalize();
+            var Angle = V1.AngleTo(V2);
 
+            List<double> Weights = Enumerable.Repeat(1.0, ControlPoints.Count).ToList();
+            NurbSpline P = (NurbSpline)NurbSpline.CreateCurve(ControlPoints, Weights);
             
-            //if (Rot == clockwise.ccw)
-            //{
-            //    var plAn =Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero);
-            //    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, P., plAn);
-            //}
-            //if (StraightPartAtStart == true)
-            //{
-            //    //ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document,P,Plane.)
-            //}
+           
+            var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ,Angle, startPoint);
+            NurbSpline RotatedCurve = (NurbSpline) P.CreateTransformed(TransForm);
+            // var dir = (EndPoint - PiPoint).Normalize();
+            // var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
+            // var aXIS = (startPoint - XYZ.BasisZ).Normalize();
+
+            //var RotatedCurve = (NurbSpline)P.CreateTransformed(Transform.CreateRotation(aXIS, Math.PI/4));
+
+
+
 
 
             List<XYZ> ConvertedPoints = new List<XYZ>();
@@ -133,49 +152,49 @@ namespace ObjectPlacementLandXml
             using (Transaction T = new Transaction(Command.uidoc.Document, "Create Spiral"))
             {
                 T.Start();
-                foreach (var item in ControlPoints)
+                foreach (var item in RotatedCurve.CtrlPoints)
                 {
                     ConvertedPoints.Add(RevitPlacmenElement.ConvertPointToInternal(item));
                 }
 
-                
+
                 var P2 = NurbSpline.CreateCurve(ConvertedPoints, Weights);
-               DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
+                DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
 
-                if (Rot == clockwise.ccw)
-                {
-                    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero);
-                    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
-                }
-                if (StraightPartAtStart == true)
-                {
-                    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisX, XYZ.Zero);
-                    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
-                    //ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document,P,Plane.)
-                }
+                //if (Rot == clockwise.ccw)
+                //{
+                //    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero);
+                //    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
+                //}
+                //if (StraightPartAtStart == true)
+                //{
+                //    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisX, XYZ.Zero);
+                //    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
+                //    //ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document,P,Plane.)
+                //}
 
 
-                //maybe flip 
-                XYZ dir = (startPoint - PiPoint).Normalize();
-                var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
+                ////maybe flip 
+                //XYZ dir = (startPoint - PiPoint).Normalize();
+                //var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
 
-                if (StraightPartAtStart)
-                {
-                    dir = (EndPoint - PiPoint).Normalize();
-                    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-                    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, EndPoint);
-                    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
+                //if (StraightPartAtStart)
+                //{
+                //    dir = (EndPoint - PiPoint).Normalize();
+                //    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
+                //    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, EndPoint);
+                //    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
 
-                    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, ((Math.PI / 2) - AngleRotation));
-                }
-                else
-                {
-                    dir = (startPoint - PiPoint).Normalize();
-                    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-                    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, startPoint);
-                    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
-                    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, -AngleRotation);
-                }
+                //    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, ((Math.PI / 2) - AngleRotation));
+                //}
+                //else
+                //{
+                //    dir = (startPoint - PiPoint).Normalize();
+                //    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
+                //    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, startPoint);
+                //    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
+                //    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, -AngleRotation);
+                //}
                 T.Commit();
             }
 
