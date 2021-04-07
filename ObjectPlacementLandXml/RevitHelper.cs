@@ -23,15 +23,22 @@ namespace ObjectPlacementLandXml
                     FamilyName = System.IO.Path.GetFileNameWithoutExtension(FamilyPath);
                 }
                 catch (Exception) { }
-
-                FamilySymbol Fam = (FamilySymbol)new FilteredElementCollector(uiDoc.Document).OfClass(typeof(FamilySymbol)).FirstOrDefault(F => F.Name == FamilyName);
-                Fam.Activate();
-
-                foreach (RevitPlacmenElement RevitPlacementEle in RevitPlacmentPoints)
+                try
                 {
-                    FamilyInstance FamIns = uiDoc.Document.Create.NewFamilyInstance(RevitPlacmenElement.ConvertPointToInternal(RevitPlacementEle.PlacementPoint), Fam, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                    RevitPlacementEle.FillAttributes(FamIns);
+                    FamilySymbol Fam = (FamilySymbol)new FilteredElementCollector(uiDoc.Document).OfClass(typeof(FamilySymbol)).FirstOrDefault(F => F.Name == FamilyName);
+                    Fam.Activate();
+
+                    foreach (RevitPlacmenElement RevitPlacementEle in RevitPlacmentPoints)
+                    {
+                        FamilyInstance FamIns = uiDoc.Document.Create.NewFamilyInstance(RevitPlacmenElement.ConvertPointToInternal(RevitPlacementEle.PlacementPoint), Fam, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                        RevitPlacementEle.FillAttributes(FamIns);
+                    }
                 }
+                catch (Exception)
+                {
+
+                }
+               
                 T.Commit();
             }
         }

@@ -20,6 +20,7 @@ namespace ObjectPlacementLandXml
     /// </summary>
     public partial class ObjectPlacement : Window
     {
+        public static double Stationincrement { get; set; }
         public ObjectPlacement()
         {
             InitializeComponent();
@@ -43,9 +44,9 @@ namespace ObjectPlacementLandXml
             {
                 this.StationDistanceTxt.Text = 0.ToString();
             }
-            var StationIncrement = double.Parse(this.StationDistanceTxt.Text);
+            Stationincrement = double.Parse(this.StationDistanceTxt.Text);
 
-            return StationIncrement;
+            return Stationincrement;
         }
         private void LandXmlPathBut(object sender, RoutedEventArgs e)
         {

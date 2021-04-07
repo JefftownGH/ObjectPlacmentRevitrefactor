@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-
 namespace ObjectPlacementLandXml
 {
     class LandXmlParser
@@ -60,14 +59,12 @@ namespace ObjectPlacementLandXml
                     var Station = StationsToStudy[i];
                     if (Station == LandXmlObject.Station)
                     {
-                        RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetStartPoint(), Station));
-                        //StationsToStudy.Remove(Station);
+                        RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetStartPoint().PlacementPoint, Station));
                         continue;
                     }
                     else if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()))
                     {
-                        RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetEndPoint(), Station));
-                        //StationsToStudy.Remove(Station);
+                        RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlObject.GetEndPoint().PlacementPoint, Station));
 
                         continue;
 
@@ -76,19 +73,16 @@ namespace ObjectPlacementLandXml
                     {
                         var PointAtStatation = LandXmlObject.GetPointAtStation(Station);
                         RevitPlacementPoint.Add(PointAtStatation);
-                        //StationsToStudy.Remove(Station);
-
                         continue;
                     }
                     else
                     {
-                        //StationsToStudy.Remove(Station);
                         continue;
                     }
                 }
 
             }
-            RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlAlignmentObjects.Last().GetEndPoint(), (Alignment.length + Alignment.staStart)));
+            RevitPlacementPoint.Add(new RevitPlacmenElement(LandXmlAlignmentObjects.Last().GetEndPoint().PlacementPoint, (Alignment.length + Alignment.staStart)));
         }
 
         //Stationing 
@@ -113,7 +107,7 @@ namespace ObjectPlacementLandXml
             {
                 foreach (object CoordGeoItem in CoordGeom.Items)
                 {
-                    var LandXmlAlignMentObj = new LandXmlStationingObject(ObjectStation, CoordGeoItem);
+                    var LandXmlAlignMentObj = new LandXmlStationingObject(ObjectStation, CoordGeoItem,Alignment);
                     Objects.Add(LandXmlAlignMentObj);
 
                     ObjectStation = LandXmlAlignMentObj.GetEndStation();
