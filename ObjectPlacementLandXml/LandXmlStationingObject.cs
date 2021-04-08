@@ -129,14 +129,25 @@ namespace ObjectPlacementLandXml
 
             var V1 = (ControlPoints.Last() - ControlPoints.First()).Normalize();
             var V2 = (EndPoint - startPoint).Normalize();
-            var Angle = V1.AngleTo(V2);
-
+            var Angle = V2.AngleTo(V1);
+            Angle =  ((Math.PI / 2) - Angle) ;
             List<double> Weights = Enumerable.Repeat(1.0, ControlPoints.Count).ToList();
             NurbSpline P = (NurbSpline)NurbSpline.CreateCurve(ControlPoints, Weights);
+
+
+            NurbSpline RotatedCurve = null;
+            if (Rot != clockwise.ccw)
+            {
+                var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ, (Angle - Math.PI / 2), startPoint);
+                 RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
+            }
+            else
+            {
+                var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ, (Angle + Math.PI / 2), EndPoint);
+                 RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
+            }
             
            
-            var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ,Angle, startPoint);
-            NurbSpline RotatedCurve = (NurbSpline) P.CreateTransformed(TransForm);
             // var dir = (EndPoint - PiPoint).Normalize();
             // var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
             // var aXIS = (startPoint - XYZ.BasisZ).Normalize();
@@ -161,6 +172,7 @@ namespace ObjectPlacementLandXml
                 var P2 = NurbSpline.CreateCurve(ConvertedPoints, Weights);
                 DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
 
+                #region
                 //if (Rot == clockwise.ccw)
                 //{
                 //    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero);
@@ -195,6 +207,7 @@ namespace ObjectPlacementLandXml
                 //    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
                 //    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, -AngleRotation);
                 //}
+                #endregion
                 T.Commit();
             }
 
