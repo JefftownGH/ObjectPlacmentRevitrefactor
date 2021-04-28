@@ -150,20 +150,7 @@ namespace ObjectPlacementLandXml
                 RotatedCurve = (NurbSpline)NurbSpline.CreateCurve(PointsReversed.ToList(), Weights);
             }
 
-            //List<XYZ> ConvertedPoints = new List<XYZ>();
-            //Will Be deleted Crap
-            //using (Transaction T = new Transaction(Command.uidoc.Document, "Create Spiral"))
-            //{
-            //    T.Start();netflix double 
-            //    foreach (var item in RotatedCurve.CtrlPoints)
-            //    {
-            //        ConvertedPoints.Add(RevitPlacmenElement.ConvertPointToInternal(item));
-            //    }
-            //    var P2 = NurbSpline.CreateCurve(ConvertedPoints, Weights);
-            //    DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
-            //    T.Commit();
-            //}
-
+           
 
             RevitSegmentElement = RotatedCurve;
             return RotatedCurve;
@@ -304,11 +291,6 @@ namespace ObjectPlacementLandXml
                 double StationParam = (StationToStudy - this.Station) / this.GetLength();
                 XYZ Point = (this.RevitSegmentElement as NurbSpline).Evaluate((StationToStudy - this.Station), false);
                 PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
-
-                //PolyLine P = PolyLine.Create()
-                //Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
-                //Point = HS.Evaluate(StationToStudy - Station, false);
-
             }
             if (this.AlignmentSegmentElement is Chain)
             {
@@ -387,13 +369,12 @@ namespace ObjectPlacementLandXml
         }
         public static double ExtractHeightForPoint(double station, Alignment alignment)
         {
-
             double Height = default(double);
             if (alignment != null)
             {
                 foreach (var HeightElements in LandXmlParser.LandxmlHeighElements)
                 {
-                    if (station > HeightElements.Range.Item1  && station < HeightElements.Range.Item1)
+                    if (station >= HeightElements.Range.Item1  && station <= HeightElements.Range.Item2)
                     {
                         var Zray = Autodesk.Revit.DB.Line.CreateUnbound(new XYZ(station,0,0), XYZ.BasisZ);
 
@@ -408,60 +389,6 @@ namespace ObjectPlacementLandXml
 
           
         }
-
-        //private static List<XYZ> ExtractHeightFromProfileElementObject(object ProfileElement, int i, object[] ProfileItemList, double station)
-        //{
-        //    List<XYZ> PviHeightPoints = new List<XYZ>();
-
-        //    XYZ PVIPoint = default(XYZ);
-        //    if (ProfileElement is PVI)
-        //    {
-        //        var PviPOint = (ProfileElement as PVI).Text;
-        //        PVIPoint = ExtractPVIPoint(PviPOint);
-
-        //        PviHeightPoints.Add(PVIPoint);
-        //    }
-        //    else if (ProfileElement is CircCurve)
-        //    {
-        //        var length = (ProfileElement as CircCurve).length;
-        //        var Radius = (ProfileElement as CircCurve).radius;
-        //        var Point = (ProfileElement as CircCurve).Text;
-
-
-        //        PVIPoint = ExtractPVIPoint(Point);
-
-        //        //var PreviousElement = ProfileItemList[i - 1];
-        //        //if (PreviousElement is CircCurve)
-        //        //{
-
-        //        //}
-        //        //else if (PreviousElement is PVI)
-        //        //{
-
-        //        //}
-
-        //        //return Height;
-        //    }
-
-        //    var BusBoy = PolyLine.Create(PviHeightPoints);
-        //    return PVIPoint;
-        //}
-
-
-
-        //private static XYZ ExtractHeightPoint(PVI PVI)
-        //{
-        //    var Point = PVI.Text;
-        //    var Tx = PVI.Text[0].Split(' ');
-        //    Double PVIX;
-        //    Double PVIZ;
-
-        //    double.TryParse(Tx[0], out PVIX);
-        //    double.TryParse(Tx[1], out PVIZ);
-
-        //    XYZ PointStart = new XYZ(PVIX, 0, PVIZ);
-        //    return PointStart;
-        //}
 
         public double GetLength()
         {

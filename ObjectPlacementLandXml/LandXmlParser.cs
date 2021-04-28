@@ -75,11 +75,15 @@ namespace ObjectPlacementLandXml
                     {
                         var CurrentPViPoint = Profilealign.Items[i];
                         ExtractHeightElements(HeightElements, Profilealign, i, CurrentPViPoint);
-
                     }
 
                 }
             }
+
+            XYZ EndPoint = HeightElements.Last().SegmentElement.GetEndPoint(1);
+            XYZ ProfileEnd = new XYZ(alignment.length, EndPoint.Y, EndPoint.Z);
+            var L = Autodesk.Revit.DB.Line.CreateBound(EndPoint, ProfileEnd);
+            HeightElements.Add(new HeightElements((HeightElements.Last().Range.Item2, alignment.length), L));
             return HeightElements;
            
         }
