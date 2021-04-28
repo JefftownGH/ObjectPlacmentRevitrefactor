@@ -49,7 +49,7 @@ namespace ObjectPlacementLandXml
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-           // RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, Command.uidoc, FamilyPath);
+           RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, Command.uidoc, FamilyPath,(string) TypesCmb.SelectedItem);
         }
     }
 }

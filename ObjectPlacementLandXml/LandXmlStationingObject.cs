@@ -25,7 +25,7 @@ namespace ObjectPlacementLandXml
             Station = station;
             AlignmentSegmentElement = alignmentElement;
             EndStation = station + this.GetLength();
-
+            Alignment = alignment;
             CreateRevitElement();
         }
 
@@ -66,7 +66,7 @@ namespace ObjectPlacementLandXml
 
         }
 
-        private Autodesk.Revit.DB.Curve CreateaSpiral(Spiral Sp)
+        private Autodesk.Revit.DB.NurbSpline CreateaSpiral(Spiral Sp)
         {
             var Splength = Sp.length;
             var spEndRadius = Sp.radiusEnd;
@@ -106,7 +106,7 @@ namespace ObjectPlacementLandXml
 
             List<XYZ> ControlPoints = new List<XYZ>();
 
-          
+
 
             for (double i = 0.0; i < tao; i = i + step)
             {
@@ -130,90 +130,43 @@ namespace ObjectPlacementLandXml
             var V1 = (ControlPoints.Last() - ControlPoints.First()).Normalize();
             var V2 = (EndPoint - startPoint).Normalize();
             var Angle = V2.AngleTo(V1);
-            Angle =  ((Math.PI / 2) - Angle) ;
+            Angle = ((Math.PI / 2) - Angle);
             List<double> Weights = Enumerable.Repeat(1.0, ControlPoints.Count).ToList();
-            NurbSpline P = (NurbSpline)NurbSpline.CreateCurve(ControlPoints, Weights);
+            var P = NurbSpline.CreateCurve(ControlPoints, Weights);
 
 
             NurbSpline RotatedCurve = null;
             if (Rot != clockwise.ccw)
             {
                 var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ, (Angle - Math.PI / 2), startPoint);
-                 RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
+                RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
             }
             else
             {
                 var TransForm = Transform.CreateRotationAtPoint(XYZ.BasisZ, (Angle + Math.PI / 2), EndPoint);
-                 RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
+                RotatedCurve = (NurbSpline)P.CreateTransformed(TransForm);
+
+                var PointsReversed = RotatedCurve.CtrlPoints.Reverse();
+                RotatedCurve = (NurbSpline)NurbSpline.CreateCurve(PointsReversed.ToList(), Weights);
             }
-            
-           
-            // var dir = (EndPoint - PiPoint).Normalize();
-            // var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-            // var aXIS = (startPoint - XYZ.BasisZ).Normalize();
 
-            //var RotatedCurve = (NurbSpline)P.CreateTransformed(Transform.CreateRotation(aXIS, Math.PI/4));
-
-
-
-
-
-            List<XYZ> ConvertedPoints = new List<XYZ>();
+            //List<XYZ> ConvertedPoints = new List<XYZ>();
             //Will Be deleted Crap
-            using (Transaction T = new Transaction(Command.uidoc.Document, "Create Spiral"))
-            {
-                T.Start();
-                foreach (var item in RotatedCurve.CtrlPoints)
-                {
-                    ConvertedPoints.Add(RevitPlacmenElement.ConvertPointToInternal(item));
-                }
+            //using (Transaction T = new Transaction(Command.uidoc.Document, "Create Spiral"))
+            //{
+            //    T.Start();netflix double 
+            //    foreach (var item in RotatedCurve.CtrlPoints)
+            //    {
+            //        ConvertedPoints.Add(RevitPlacmenElement.ConvertPointToInternal(item));
+            //    }
+            //    var P2 = NurbSpline.CreateCurve(ConvertedPoints, Weights);
+            //    DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
+            //    T.Commit();
+            //}
 
 
-                var P2 = NurbSpline.CreateCurve(ConvertedPoints, Weights);
-                DetailCurve D = Command.uidoc.Document.Create.NewDetailCurve(Command.uidoc.Document.ActiveView, P2);
-
-                #region
-                //if (Rot == clockwise.ccw)
-                //{
-                //    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero);
-                //    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
-                //}
-                //if (StraightPartAtStart == true)
-                //{
-                //    var plAn = Plane.CreateByNormalAndOrigin(XYZ.BasisX, XYZ.Zero);
-                //    ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document, D.Id, plAn);
-                //    //ElementTransformUtils.MirrorElement(Command.uiapp.ActiveUIDocument.Document,P,Plane.)
-                //}
-
-
-                ////maybe flip 
-                //XYZ dir = (startPoint - PiPoint).Normalize();
-                //var AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-
-                //if (StraightPartAtStart)
-                //{
-                //    dir = (EndPoint - PiPoint).Normalize();
-                //    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-                //    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, EndPoint);
-                //    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
-
-                //    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, ((Math.PI / 2) - AngleRotation));
-                //}
-                //else
-                //{
-                //    dir = (startPoint - PiPoint).Normalize();
-                //    AngleRotation = dir.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
-                //    ElementTransformUtils.MoveElement(Command.uidoc.Document, D.Id, startPoint);
-                //    Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(new XYZ(0, 0, 1), new XYZ(0, 0, 100));
-                //    ElementTransformUtils.RotateElement(Command.uidoc.Document, D.Id, L, -AngleRotation);
-                //}
-                #endregion
-                T.Commit();
-            }
-
-
-            RevitSegmentElement = P;
-            return P;
+            RevitSegmentElement = RotatedCurve;
+            return RotatedCurve;
         }
 
         public RevitPlacmenElement GetStartPoint()
@@ -241,7 +194,7 @@ namespace ObjectPlacementLandXml
                 //Review 
                 StartPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
             }
-            var StartPointPlacement = ExtractHeightForPoint(new RevitPlacmenElement(StartPoint, Station));
+            var StartPointPlacement = new RevitPlacmenElement(StartPoint, Station, this.Alignment);
 
             return StartPointPlacement;
         }
@@ -272,9 +225,9 @@ namespace ObjectPlacementLandXml
                 EndPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
             }
 
-            var EndPointPlacment = ExtractHeightForPoint(new RevitPlacmenElement(EndPoint, EndStation));
 
-            return EndPointPlacment;
+
+            return new RevitPlacmenElement(EndPoint, EndStation, this.Alignment);
         }
         public double GetEndStation()
         {
@@ -328,13 +281,13 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentSegmentElement is Line)
             {
                 XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
-                PointElement = new RevitPlacmenElement(Point, StationToStudy);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
 
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
                 XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
-                PointElement = new RevitPlacmenElement(Point, StationToStudy);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
 
             }
             if (this.AlignmentSegmentElement is Curve)
@@ -342,16 +295,19 @@ namespace ObjectPlacementLandXml
                 double StationParam;
                 StationParam = 1 - (((StationToStudy - this.Station)) / this.GetLength());
                 XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Arc).Evaluate(StationParam, true);
-                PointElement = new RevitPlacmenElement(Point, StationToStudy);
+
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
 
             }
             if (this.AlignmentSegmentElement is Spiral)
             {
+                double StationParam = (StationToStudy - this.Station) / this.GetLength();
+                XYZ Point = (this.RevitSegmentElement as NurbSpline).Evaluate((StationToStudy - this.Station), false);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
 
                 //PolyLine P = PolyLine.Create()
                 //Arc HS = Arc.Create(this.GetStartPoint(), this.GetEndPoint(), this.GetPointPI());
                 //Point = HS.Evaluate(StationToStudy - Station, false);
-                PointElement = this.GetStartPoint();
 
             }
             if (this.AlignmentSegmentElement is Chain)
@@ -360,7 +316,6 @@ namespace ObjectPlacementLandXml
                 //return ExtractPoint((this.AlignmentElement as Chain).Text);
             }
 
-            ExtractHeightForPoint(PointElement);
             return PointElement;
         }
 
@@ -395,45 +350,118 @@ namespace ObjectPlacementLandXml
             return Arc.Create(PointEnd, PointStart, midPointArc);
 
         }
-        private RevitPlacmenElement ExtractHeightForPoint(RevitPlacmenElement point)
+        public static Arc CreateArcFromCircCurve(XYZ PointStart, XYZ PointEnd, double radius, bool largeSagitta)
         {
-            if (this.Alignment != null)
+            PointStart = new XYZ(PointStart.X, PointStart.Z, 0);
+            PointEnd = new XYZ(PointEnd.X, PointEnd.Z, 0);
+
+            XYZ midPointChord = 0.5 * (PointStart + PointEnd);
+
+            XYZ v = null;
+            //if (!(bool)this.GetArcRotationAntiClockWise())
+            //{
+            //    v = PointEnd - PointStart;
+            //}
+            //else
+            //{
+            v = PointStart - PointEnd;
+            //}            //}
+            double d = 0.5 * v.GetLength(); // half chord length
+
+            // Small and large circle sagitta:
+            // http://www.mathopenref.com/sagitta.html
+
+            double s = largeSagitta
+              ? radius + Math.Sqrt(radius * radius - d * d) // sagitta large
+              : radius - Math.Sqrt(radius * radius - d * d); // sagitta small
+
+            var PX = Transform.CreateRotation(XYZ.BasisZ, 0.5 * Math.PI);
+            var PX2 = v.Normalize();
+            var PX3 = v.Normalize().Multiply(s);
+            XYZ midPointArc = midPointChord + Transform.CreateRotation(XYZ.BasisZ, 0.5 * Math.PI).OfVector(v.Normalize().Multiply(s));
+
+            var PointARcEnd = new XYZ(PointEnd.X, PointEnd.Z, PointEnd.Y);
+            var PointArcStart = new XYZ(PointStart.X, PointStart.Z, PointStart.Y);
+            var PointArcMid = new XYZ(midPointArc.X, midPointArc.Z, midPointArc.Y);
+            return Arc.Create(PointARcEnd, PointArcStart, PointArcMid);
+        }
+        public static double ExtractHeightForPoint(double station, Alignment alignment)
+        {
+
+            double Height = default(double);
+            if (alignment != null)
             {
-                foreach (Profile Prof in this.Alignment.Items.OfType<Profile>())
+                foreach (var HeightElements in LandXmlParser.LandxmlHeighElements)
                 {
-                    foreach (var Profilealign in Prof.Items.OfType<ProfAlign>())
+                    if (station > HeightElements.Range.Item1  && station < HeightElements.Range.Item1)
                     {
-                        foreach (var PVI in Profilealign.Items.OfType<PVI>())
-                        {
-                            //ExtractHeightPoint(PVI);
-                        }
+                        var Zray = Autodesk.Revit.DB.Line.CreateUnbound(new XYZ(station,0,0), XYZ.BasisZ);
+
+                        IntersectionResultArray Intersections = null;
+                        var REsult = HeightElements.SegmentElement.Intersect(Zray, out Intersections);
+                        var IntersectionPoint  = Intersections.get_Item(0).XYZPoint;
+                       return IntersectionPoint.Z;
                     }
                 }
-
             }
-            return point;
+            return default(double);
 
-            //LineX LL = LineX.CreateBound(PointBeforeIt, HeightPoint);
-            //XYZ Vector = HeightPoint - PointBeforeIt;
-            //var Angle = XYZ.BasisX.AngleTo(Vector) * 180 / Math.PI;
-            //var XPoint = (StationToStudy - PointBeforeIt.X);
-            //var point = LL.Evaluate((XPoint / (HeightPoint.X - PointBeforeIt.X)), true);
-            //point = new XYZ(point.X, point.Y, point.Z);
+          
         }
 
-        private static XYZ ExtractHeightPoint(PVI PVI)
-        {
-            var Point = PVI.Text;
-            var Tx = PVI.Text[0].Split(' ');
-            Double PVIX;
-            Double PVIZ;
+        //private static List<XYZ> ExtractHeightFromProfileElementObject(object ProfileElement, int i, object[] ProfileItemList, double station)
+        //{
+        //    List<XYZ> PviHeightPoints = new List<XYZ>();
 
-            double.TryParse(Tx[0], out PVIX);
-            double.TryParse(Tx[1], out PVIZ);
+        //    XYZ PVIPoint = default(XYZ);
+        //    if (ProfileElement is PVI)
+        //    {
+        //        var PviPOint = (ProfileElement as PVI).Text;
+        //        PVIPoint = ExtractPVIPoint(PviPOint);
 
-            XYZ PointStart = new XYZ(PVIX, 0, PVIZ);
-            return PointStart;
-        }
+        //        PviHeightPoints.Add(PVIPoint);
+        //    }
+        //    else if (ProfileElement is CircCurve)
+        //    {
+        //        var length = (ProfileElement as CircCurve).length;
+        //        var Radius = (ProfileElement as CircCurve).radius;
+        //        var Point = (ProfileElement as CircCurve).Text;
+
+
+        //        PVIPoint = ExtractPVIPoint(Point);
+
+        //        //var PreviousElement = ProfileItemList[i - 1];
+        //        //if (PreviousElement is CircCurve)
+        //        //{
+
+        //        //}
+        //        //else if (PreviousElement is PVI)
+        //        //{
+
+        //        //}
+
+        //        //return Height;
+        //    }
+
+        //    var BusBoy = PolyLine.Create(PviHeightPoints);
+        //    return PVIPoint;
+        //}
+
+
+
+        //private static XYZ ExtractHeightPoint(PVI PVI)
+        //{
+        //    var Point = PVI.Text;
+        //    var Tx = PVI.Text[0].Split(' ');
+        //    Double PVIX;
+        //    Double PVIZ;
+
+        //    double.TryParse(Tx[0], out PVIX);
+        //    double.TryParse(Tx[1], out PVIZ);
+
+        //    XYZ PointStart = new XYZ(PVIX, 0, PVIZ);
+        //    return PointStart;
+        //}
 
         public double GetLength()
         {

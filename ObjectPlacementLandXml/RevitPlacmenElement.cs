@@ -7,10 +7,14 @@ namespace ObjectPlacementLandXml
         public XYZ PlacementPoint { get; set; }
         public double Station { get; set; }
 
-        public RevitPlacmenElement(XYZ placementPoint, double station)
+        public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment)
         {
             PlacementPoint = placementPoint;
             Station = station;
+
+            var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(station, alignment);
+            
+            this.PlacementPoint = new XYZ(PlacementPoint.X, PlacementPoint.Y, PointElevation);
         }
         public static XYZ ConvertPointToInternal(XYZ PointToConvert)
         {

@@ -28,7 +28,7 @@ namespace ObjectPlacementLandXml
 
         private void Run_click(object sender, RoutedEventArgs e)
         {
-            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace());
+            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace(), (double)ExtractStationPlacmentStart(), (double)ExtractStationPlacmentEnd());
 
             ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text);
             W.ShowDialog();
@@ -47,6 +47,25 @@ namespace ObjectPlacementLandXml
             Stationincrement = double.Parse(this.StationDistanceTxt.Text);
 
             return Stationincrement;
+        }
+        public double? ExtractStationPlacmentStart()
+        {
+            double StationPlaceMentStart = default(double);
+            if (!string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+            {
+                StationPlaceMentStart = double.Parse(this.PlacmentStartStationText.Text);
+            }
+
+            return StationPlaceMentStart;
+        }
+        public double? ExtractStationPlacmentEnd()
+        {
+            double StationPlaceMentEnd = default(double);
+            if (!string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+            {
+                StationPlaceMentEnd = double.Parse(this.PlacmentEndStationText.Text);
+            }
+            return StationPlaceMentEnd;
         }
         private void LandXmlPathBut(object sender, RoutedEventArgs e)
         {

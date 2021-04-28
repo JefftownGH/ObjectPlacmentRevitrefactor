@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ObjectPlacementLandXml"
         mc:Ignorable="d"
-        Title="ObjectPlacement" Height="300.507" Width="781.757">
+        Title="ObjectPlacement" Height="330.59" Width="782.757">
     <Grid>
         <Grid.ColumnDefinitions>
         </Grid.ColumnDefinitions>
-        <TextBox Height="24" Margin="219,0,10,183" TextWrapping="Wrap" Text="5" VerticalAlignment="Bottom" Name="StationDistanceTxt"/>
-        <TextBox Height="24" Margin="219,0,10,155" TextWrapping="Wrap" Text="100" VerticalAlignment="Bottom" Name="HorizontalDistancetext"/>
-        <Label Content="Distance Between Stations : m" Margin="6,0,560,181" Height="26" VerticalAlignment="Bottom"/>
-        <Label Content="Horitzonal Distance : mm" Margin="6,0,560,153" Height="26" VerticalAlignment="Bottom"/>
-        <Button Content="Run" Margin="0,0,5,10" Click="Run_click" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="114" RenderTransformOrigin="0.513,0.8" Grid.Column="1">
+        <TextBox Height="24" Margin="220,0,9,184" TextWrapping="Wrap" Text="5" VerticalAlignment="Bottom" Name="StationDistanceTxt"/>
+        <TextBox Height="24" Margin="220,0,9,156" TextWrapping="Wrap" Text="100" VerticalAlignment="Bottom" Name="HorizontalDistancetext"/>
+        <Label Content="Distance Between Stations : m" Margin="7,0,559,182" Height="26" VerticalAlignment="Bottom"/>
+        <Label Content="Horitzonal Distance : mm" Margin="7,0,559,154" Height="26" VerticalAlignment="Bottom"/>
+        <Button Content="Run" Margin="0,0,3,8" Click="Run_click" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="217" RenderTransformOrigin="0.513,0.8">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -23,20 +23,24 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <Label Content="Elevation From Line : mm" Margin="6,0,560,127" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox Height="24" Margin="219,0,10,126" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="ElevationTxt"/>
-        <TextBox Margin="8,0,53,213" TextWrapping="Wrap" Text="" x:Name="FamilyPath" Height="18" VerticalAlignment="Bottom" />
-        <Button Content="..." Margin="0,0,10,213" Click="RevitBrowserClick" HorizontalAlignment="Right" Width="38" Height="18" VerticalAlignment="Bottom"/>
-        <Label Content="Select Family Path" HorizontalAlignment="Left" Margin="6,0,0,208" Width="118" Height="27" VerticalAlignment="Bottom"/>
-        <Label Content="Rotation Angle in Plane: Degrees" Margin="8,0,560,96" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox Height="24" Margin="219,0,10,95" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="DegreesTxt"/>
-        <Label Content="Inclination Angle in XZ Plane: Degrees" Margin="8,0,560,65" Height="26" VerticalAlignment="Bottom"/>
-        <Label Content="Text Height : mm" Margin="10,0,560,37" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox Height="24" Margin="219,0,10,65" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="InclinationTxt"/>
-        <TextBox Height="24" Margin="219,0,10,39" TextWrapping="Wrap" Text="200" VerticalAlignment="Bottom" x:Name="TextHeightTxt"/>
-        <TextBox Margin="8,0,53,240" TextWrapping="Wrap" Text="" x:Name="LandXmlPath" Height="18" VerticalAlignment="Bottom" />
-        <Button Content="..." Margin="0,0,10,240" Click="LandXmlPathBut" HorizontalAlignment="Right" Width="38" Height="18" VerticalAlignment="Bottom"/>
-        <Label Content="Select LandXml Path" HorizontalAlignment="Left" Margin="8,0,0,235" Width="118" Height="27" VerticalAlignment="Bottom"/>
+        <Label Content="Elevation From Line : mm" Margin="7,0,559,128" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="220,0,9,127" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="ElevationTxt"/>
+        <TextBox Margin="145,0,52,238" TextWrapping="Wrap" Text="" x:Name="FamilyPath" Height="18" VerticalAlignment="Bottom" />
+        <Button Content="..." Margin="0,0,9,238" Click="RevitBrowserClick" HorizontalAlignment="Right" Width="38" Height="18" VerticalAlignment="Bottom"/>
+        <Label Content="Select Family Path" HorizontalAlignment="Left" Margin="11,0,0,238" Width="118" Height="27" VerticalAlignment="Bottom"/>
+        <Label Content="Rotation Angle in Plane: Degrees" Margin="9,0,559,97" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="220,0,9,96" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="DegreesTxt"/>
+        <Label Content="Inclination Angle in XZ Plane: Degrees" Margin="9,0,559,66" Height="26" VerticalAlignment="Bottom"/>
+        <Label Content="Text Height : mm" Margin="11,0,559,38" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="220,0,9,66" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="InclinationTxt"/>
+        <TextBox Height="24" Margin="220,0,9,40" TextWrapping="Wrap" Text="200" VerticalAlignment="Bottom" x:Name="TextHeightTxt"/>
+        <TextBox Margin="145,0,52,265" TextWrapping="Wrap" Text="" x:Name="LandXmlPath" Height="18" VerticalAlignment="Bottom" />
+        <Button Content="..." Margin="0,0,9,265" Click="LandXmlPathBut" HorizontalAlignment="Right" Width="38" Height="18" VerticalAlignment="Bottom"/>
+        <Label Content="Select LandXml Path" HorizontalAlignment="Left" Margin="13,0,0,265" Width="118" Height="27" VerticalAlignment="Bottom"/>
+        <Label Content="From Station" Margin="13,0,0,208" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="78"/>
+        <Label Content="To Station" Margin="288,0,404,208" VerticalAlignment="Bottom" RenderTransformOrigin="4.871,-0.231"/>
+        <TextBox Margin="145,0,492,215" TextWrapping="Wrap" Text="" x:Name="PlacmentStartStationText" Height="18" VerticalAlignment="Bottom" />
+        <TextBox Margin="378,0,259,215" TextWrapping="Wrap" Text="" x:Name="PlacmentEndStationText" Height="18" VerticalAlignment="Bottom" />
 
     </Grid>
 </Window>

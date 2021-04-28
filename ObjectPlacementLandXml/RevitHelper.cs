@@ -10,9 +10,9 @@ namespace ObjectPlacementLandXml
 {
     class RevitHelper
     {
-        internal static void PlaceRevitFamilies(List<RevitPlacmenElement> RevitPlacmentPoints, UIDocument uiDoc, string FamilyPath)
+        internal static void PlaceRevitFamilies(List<RevitPlacmenElement> RevitPlacmentPoints, UIDocument uiDoc, string FamilyPath, string TypeName)
         {
-            string FamilyName = "3DAlignment_Tool";
+            string FamilyName = string.Empty;
 
             using (Transaction T = new Transaction(uiDoc.Document, "Place Objects"))
             {
@@ -25,7 +25,7 @@ namespace ObjectPlacementLandXml
                 catch (Exception) { }
                 try
                 {
-                    FamilySymbol Fam = (FamilySymbol)new FilteredElementCollector(uiDoc.Document).OfClass(typeof(FamilySymbol)).FirstOrDefault(F => F.Name == FamilyName);
+                    FamilySymbol Fam = new FilteredElementCollector(uiDoc.Document).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault(F => F.Name == TypeName && F.FamilyName == FamilyName);
                     Fam.Activate();
 
                     foreach (RevitPlacmenElement RevitPlacementEle in RevitPlacmentPoints)
