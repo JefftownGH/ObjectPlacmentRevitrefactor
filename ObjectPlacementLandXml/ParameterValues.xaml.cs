@@ -12,7 +12,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
 namespace ObjectPlacementLandXml
 {
     /// <summary>
@@ -20,22 +19,28 @@ namespace ObjectPlacementLandXml
     /// </summary>
     public partial class ParameterValues : Window
     {
-        public ParameterValues(List<RevitPlacmenElement> revitPlaceMentPoints, string familypath)
+        ElementTransformParams Transform;
+         public static List<ParameterElement> ParamNames;
+        public ParameterValues(List<RevitPlacmenElement> revitPlaceMentPoints, string familypath, ElementTransformParams transForm)
         {
             InitializeComponent();
             RevitPlaceMentPoints = revitPlaceMentPoints;
             FamilyPath = familypath;
+            Transform = transForm;
 
             var FamDoc = Command.uiapp.Application.OpenDocumentFile(FamilyPath).FamilyManager;
             List<string> TypeNames = new List<string>();
             foreach (FamilyType item in FamDoc.Types)
             {
-                TypeNames.Add(item.Name);
+                if (!String.IsNullOrWhiteSpace(item.Name))
+                {
+                    TypeNames.Add(item.Name);
+                }
             }
-           TypesCmb.ItemsSource = TypeNames;
-           TypesCmb.SelectedIndex = 0;
+            TypesCmb.ItemsSource = TypeNames;
+            TypesCmb.SelectedIndex = 0;
 
-            List<ParameterElement> ParamNames = new List<ParameterElement>();
+            ParamNames = new List<ParameterElement>();
             foreach (FamilyParameter Famparam in FamDoc.Parameters)
             {
                 //var Param = new (string, string)(Famparam.Definition.Name,"");
@@ -49,7 +54,10 @@ namespace ObjectPlacementLandXml
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-           RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, Command.uidoc, FamilyPath,(string) TypesCmb.SelectedItem);
+            var FamilyList = RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, Command.uidoc, FamilyPath, (string)TypesCmb.SelectedItem, Transform);
+            
+          
+
         }
     }
 }

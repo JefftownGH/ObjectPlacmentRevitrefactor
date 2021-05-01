@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using System;
 
 namespace ObjectPlacementLandXml
 {
@@ -10,10 +11,10 @@ namespace ObjectPlacementLandXml
         public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment)
         {
             PlacementPoint = placementPoint;
-            Station = station;
+            Station = Math.Round(station, 4);
 
-            var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(station, alignment);
-            
+            var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(this.Station, alignment);
+
             this.PlacementPoint = new XYZ(PlacementPoint.X, PlacementPoint.Y, PointElevation);
         }
         public static XYZ ConvertPointToInternal(XYZ PointToConvert)
@@ -45,8 +46,104 @@ namespace ObjectPlacementLandXml
         }
         public void FillAttributes(FamilyInstance FamIns)
         {
-            FamIns.LookupParameter("Text").Set(Station.ToString());
-        }
+            try
+            {
+                foreach (var Param in ParameterValues.ParamNames)
+                {
+                    try
+                    {
+                        Parameter ParamFou = FamIns.LookupParameter(Param.ParameterName);
+                        if (ParamFou != null && !string.IsNullOrEmpty(Param.ParameterValue))
+                        {
+                            switch (ParamFou.StorageType)
+                            {
+                                case StorageType.None:
+                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
+                                    break;
+                                case StorageType.Integer:
+                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
+                                    break;
+                                case StorageType.Double:
+                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
+                                    break;
+                                case StorageType.String:
+                                    ParamFou.Set(Param.ParameterValue.ToString());
+                                    break;
+                                //case StorageType.ElementId:
+                                //    ParamFou.Set(Station.ToString());
+                                //    break;
+                                default:
+                                    ParamFou.Set(Station.ToString());
+                                    break;
+                            }
+                            
+                            
+                        }
 
+
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+
+                }
+                FamIns.LookupParameter("Text").Set(Station.ToString());
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        //private void FillParameters(FamilyInstance FamIns, double Stationtext)
+        //{
+        //    try
+        //    {
+        //        if (!string.IsNullOrWhiteSpace(this.ElevationTxt.Text))
+        //        {
+        //            var elevation = UnitUtils.ConvertToInternalUnits(double.Parse(this.ElevationTxt.Text), DisplayUnitType.DUT_MILLIMETERS);
+        //            FamIns.LookupParameter("Elevation").Set(elevation);
+        //        }
+
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //    try
+        //    {
+        //        var RoundedX = Math.Round(Stationtext, 3);
+        //        FamIns.LookupParameter("Text").Set(RoundedX.ToString());
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //    try
+        //    {
+        //        var HorizontalDistance = UnitUtils.ConvertToInternalUnits(double.Parse(this.HorizontalDistancetext.Text), DisplayUnitType.DUT_MILLIMETERS);
+        //        FamIns.LookupParameter("Horizontal Distance").Set(HorizontalDistance);
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //    try
+        //    {
+        //        var HorizontalDistance = UnitUtils.ConvertToInternalUnits(double.Parse(this.TextHeightTxt.Text), DisplayUnitType.DUT_MILLIMETERS);
+        //        FamIns.LookupParameter("TextDepth").Set(HorizontalDistance);
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //    try
+        //    {
+        //        Double Inclinnation = UnitUtils.ConvertToInternalUnits(double.Parse(InclinationTxt.Text), DisplayUnitType.DUT_DEGREES_AND_MINUTES);
+        //        FamIns.LookupParameter("InclinationAngle").Set(Inclinnation);
+
+
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //    }
+        //}
     }
 }

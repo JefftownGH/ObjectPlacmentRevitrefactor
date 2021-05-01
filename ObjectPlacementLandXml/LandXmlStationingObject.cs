@@ -38,8 +38,8 @@ namespace ObjectPlacementLandXml
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
-                Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint().PlacementPoint, this.GetEndPoint().PlacementPoint);
-                RevitSegmentElement = L;
+               // Autodesk.Revit.DB.Line L = Autodesk.Revit.DB.Line.CreateBound(this.GetStartPoint().PlacementPoint, this.GetEndPoint().PlacementPoint);
+              //  RevitSegmentElement = L;
 
             }
             if (this.AlignmentSegmentElement is Curve)
@@ -165,7 +165,7 @@ namespace ObjectPlacementLandXml
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
-                StartPoint = ExtractPoint((this.AlignmentSegmentElement as IrregularLine).Start);
+                //StartPoint = ExtractPoint((this.AlignmentSegmentElement as IrregularLine).Start);
             }
             if (this.AlignmentSegmentElement is Curve)
             {
@@ -179,7 +179,7 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentSegmentElement is Chain)
             {
                 //Review 
-                StartPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
+                //StartPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
             }
             var StartPointPlacement = new RevitPlacmenElement(StartPoint, Station, this.Alignment);
 
@@ -195,7 +195,7 @@ namespace ObjectPlacementLandXml
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
-                EndPoint = ExtractPoint((this.AlignmentSegmentElement as IrregularLine).End);
+              //  EndPoint = ExtractPoint((this.AlignmentSegmentElement as IrregularLine).End);
             }
             if (this.AlignmentSegmentElement is Curve)
             {
@@ -209,7 +209,7 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentSegmentElement is Chain)
             {
                 //Review 
-                EndPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
+               // EndPoint = ExtractPoint((this.AlignmentSegmentElement as Chain).Text);
             }
 
 
@@ -224,7 +224,7 @@ namespace ObjectPlacementLandXml
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
-                return (this.Station + (this.AlignmentSegmentElement as IrregularLine).length);
+                //return (this.Station + (this.AlignmentSegmentElement as IrregularLine).length);
             }
             if (this.AlignmentSegmentElement is Curve)
             {
@@ -237,7 +237,7 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentSegmentElement is Chain)
             {
                 //Review 
-                return (this.Station + (this.AlignmentSegmentElement as Chain).station);
+                //return (this.Station + (this.AlignmentSegmentElement as Chain).station);
             }
 
             return default(double);
@@ -273,8 +273,8 @@ namespace ObjectPlacementLandXml
             }
             if (this.AlignmentSegmentElement is IrregularLine)
             {
-                XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
-                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
+               // XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
+              //  PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment);
 
             }
             if (this.AlignmentSegmentElement is Curve)

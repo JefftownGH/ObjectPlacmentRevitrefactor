@@ -30,7 +30,9 @@ namespace ObjectPlacementLandXml
         {
             var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace(), (double)ExtractStationPlacmentStart(), (double)ExtractStationPlacmentEnd());
 
-            ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text);
+            ElementTransformParams TransForm = ExtractTransformParameters();
+           
+            ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text, TransForm);
             W.ShowDialog();
             //RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, uiDoc, FamilyPath.Text);
             this.Close();
@@ -38,6 +40,29 @@ namespace ObjectPlacementLandXml
 
 
         }
+
+        private ElementTransformParams ExtractTransformParameters()
+        {
+            ElementTransformParams TransForm = new ElementTransformParams();
+            if (!string.IsNullOrEmpty(this.HorizontalDistancetext.Text))
+            {
+                TransForm.HorizontalDistance = double.Parse(this.HorizontalDistancetext.Text);
+            }
+            if (!string.IsNullOrEmpty(this.ElevationTxt.Text))
+            {
+                TransForm.ElevationFromAlignment = double.Parse(this.ElevationTxt.Text);
+            }
+            if (!string.IsNullOrEmpty(this.DegreesTxt.Text))
+            {
+                TransForm.RotationAngleInPlane = double.Parse(this.DegreesTxt.Text);
+            }
+            if (!string.IsNullOrEmpty(this.InclinationTxt.Text))
+            {
+                TransForm.InclinationAngleInXZPlane = double.Parse(this.InclinationTxt.Text);
+            }
+            return TransForm;
+        }
+
         public double ExtractStationDisntace()
         {
             if (string.IsNullOrEmpty(this.StationDistanceTxt.Text))
@@ -51,7 +76,7 @@ namespace ObjectPlacementLandXml
         public double? ExtractStationPlacmentStart()
         {
             double StationPlaceMentStart = default(double);
-            if (!string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+            if (!string.IsNullOrEmpty(this.PlacmentStartStationText.Text))
             {
                 StationPlaceMentStart = double.Parse(this.PlacmentStartStationText.Text);
             }
@@ -61,7 +86,7 @@ namespace ObjectPlacementLandXml
         public double? ExtractStationPlacmentEnd()
         {
             double StationPlaceMentEnd = default(double);
-            if (!string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+            if (!string.IsNullOrEmpty(this.PlacmentEndStationText.Text))
             {
                 StationPlaceMentEnd = double.Parse(this.PlacmentEndStationText.Text);
             }

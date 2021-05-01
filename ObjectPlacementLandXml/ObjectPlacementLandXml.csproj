@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="ElementTransformParams.cs" />
     <Compile Include="HeightElements.cs" />
     <Compile Include="LandXML-1_2_debugged.cs" />
     <Compile Include="LandXmlParser.cs" />

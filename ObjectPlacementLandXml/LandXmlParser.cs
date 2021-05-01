@@ -31,7 +31,7 @@ namespace ObjectPlacementLandXml
 
         private static List<RevitPlacmenElement> ExtractPointPlacment(LandXML Landx, double StationIncrement, double placmentStationStart, double stationPlacementend)
         {
-            List<RevitPlacmenElement> RevitPlacementPoint = new List<RevitPlacmenElement>();
+            List<RevitPlacmenElement> RevitPlacementPoints = new List<RevitPlacmenElement>();
 
             foreach (Alignments Alignments in Landx.Items.OfType<Alignments>())
             {
@@ -39,17 +39,26 @@ namespace ObjectPlacementLandXml
                 {
                     //stationing
                     List<double> Stations = CreateStationing(StationIncrement, Alignment);
+
+                    if (placmentStationStart == default(double))
+                    {
+                        placmentStationStart = Alignment.staStart;
+                    }
+                    if (stationPlacementend == default(double))
+                    {
+                        stationPlacementend = Alignment.length;
+                    }
                     Stations.RemoveAll(E => E < placmentStationStart || E > stationPlacementend);
 
-                     LandxmlHeighElements = ExtractHeightElemenets(Alignment);
+                    LandxmlHeighElements = ExtractHeightElemenets(Alignment);
 
                     List<LandXmlStationingObject> LandXmlAlignmentObjects = ExtractStartAndEndStationing(Alignment, Stations);
                     //Placment
-                    ExtractPlacementPoints(RevitPlacementPoint, Stations, LandXmlAlignmentObjects);
+                    ExtractPlacementPoints(Alignment,RevitPlacementPoints, Stations, LandXmlAlignmentObjects);
                 }
             }
 
-            return RevitPlacementPoint;
+            return RevitPlacementPoints;
         }
         private static XYZ ExtractPVIPoint(string[] ProfileElement)
         {
@@ -82,10 +91,13 @@ namespace ObjectPlacementLandXml
 
             XYZ EndPoint = HeightElements.Last().SegmentElement.GetEndPoint(1);
             XYZ ProfileEnd = new XYZ(alignment.length, EndPoint.Y, EndPoint.Z);
-            var L = Autodesk.Revit.DB.Line.CreateBound(EndPoint, ProfileEnd);
-            HeightElements.Add(new HeightElements((HeightElements.Last().Range.Item2, alignment.length), L));
+            if (EndPoint.X != ProfileEnd.X)
+            {
+                var L = Autodesk.Revit.DB.Line.CreateBound(EndPoint, ProfileEnd);
+                HeightElements.Add(new HeightElements((HeightElements.Last().Range.Item2, alignment.length), L));
+            }
             return HeightElements;
-           
+
         }
 
         private static void ExtractHeightElements(List<HeightElements> HeightElements, ProfAlign Profilealign, int i, object CurrentPViPoint)
@@ -106,9 +118,9 @@ namespace ObjectPlacementLandXml
                 (double, double) ARcRange, LineAfterRange;
                 XYZ ArcPointEnd, NextPviPoint;
                 Arc ARC;
-               
+
                 GetarcElementPVI(Profilealign, i, CurrentPViPoint, out ARcRange, out ArcPointEnd, out LineAfterRange, out NextPviPoint, out ARC);
-               
+
                 HeightElements.Add(new HeightElements(ARcRange, ARC));
 
                 var LineAfterCurve = Autodesk.Revit.DB.Line.CreateBound(ArcPointEnd, NextPviPoint);
@@ -171,7 +183,7 @@ namespace ObjectPlacementLandXml
             var L2 = Autodesk.Revit.DB.Line.CreateBound(PVIPoint, NextPviPoint);
             var Value2 = (PVIPoint.X + HalfArchLength);
             XYZ PointToProject2 = new XYZ(Value2, 0, 0);
-           // ArcPointEnd = L2.Project(PointToProject2).XYZPoint;
+            // ArcPointEnd = L2.Project(PointToProject2).XYZPoint;
             var Zray2 = Autodesk.Revit.DB.Line.CreateUnbound(PointToProject2, XYZ.BasisZ);
             IntersectionResultArray Intersections2 = null;
             var REsult2 = L2.Intersect(Zray2, out Intersections2);
@@ -202,39 +214,42 @@ namespace ObjectPlacementLandXml
             return LineElement;
         }
 
-        private static void ExtractPlacementPoints(List<RevitPlacmenElement> RevitPlacementPoint, List<double> Stations, List<LandXmlStationingObject> LandXmlAlignmentObjects)
+        private static void ExtractPlacementPoints(Alignment alignment,List<RevitPlacmenElement> RevitPlacementPoint, List<double> Stations, List<LandXmlStationingObject> LandXmlAlignmentObjects)
         {
             var StationsToStudy = Stations.Distinct().ToList();
             StationsToStudy.Sort();
 
             foreach (var LandXmlObject in LandXmlAlignmentObjects)
             {
-                for (int i = 0; i < StationsToStudy.Count; i++)
+                if (LandXmlObject.Alignment == alignment)
                 {
-                    var Station = StationsToStudy[i];
-                    if (Station == LandXmlObject.Station)
+                    for (int i = 0; i < StationsToStudy.Count; i++)
                     {
-                        RevitPlacementPoint.Add(LandXmlObject.GetStartPoint());
-                        continue;
-                    }
-                    else if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()))
-                    {
-                        RevitPlacementPoint.Add(LandXmlObject.GetEndPoint());
-                        continue;
-                    }
-                    else if (Station > LandXmlObject.Station && Station < (LandXmlObject.Station + LandXmlObject.GetLength()))
-                    {
-                        var PointAtStatation = LandXmlObject.GetPointAtStation(Station);
-                        RevitPlacementPoint.Add(PointAtStatation);
-                        continue;
-                    }
-                    else
-                    {
-                        continue;
+                        var Station = StationsToStudy[i];
+                        if (Station == LandXmlObject.Station)
+                        {
+                            RevitPlacementPoint.Add(LandXmlObject.GetStartPoint());
+                            continue;
+                        }
+                        //else if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()))
+                        //{
+                        //    RevitPlacementPoint.Add(LandXmlObject.GetEndPoint());
+                        //    continue;
+                        //}
+                        else if (Station > LandXmlObject.Station && Station < (LandXmlObject.Station + LandXmlObject.GetLength()))
+                        {
+                            var PointAtStatation = LandXmlObject.GetPointAtStation(Station);
+                            RevitPlacementPoint.Add(PointAtStatation);
+                            continue;
+                        }
+                        //else
+                        //{
+                        //    continue;
+                        //}
                     }
                 }
             }
-            RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
+             RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
         }
 
         //Stationing 
@@ -267,7 +282,7 @@ namespace ObjectPlacementLandXml
                 }
 
             }
-
+            Stations = Stations.Distinct().ToList();
             return Objects;
         }
 

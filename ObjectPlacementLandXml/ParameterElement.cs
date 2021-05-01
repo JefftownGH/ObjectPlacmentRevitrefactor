@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ObjectPlacementLandXml
 {
-    class ParameterElement 
+    public class ParameterElement 
     {
         public String ParameterName { get; set; }
         public String ParameterValue { get; set; }
