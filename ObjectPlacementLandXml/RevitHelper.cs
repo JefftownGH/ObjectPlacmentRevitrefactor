@@ -16,6 +16,7 @@ namespace ObjectPlacementLandXml
             List<FamilyInstance> CreatedInstances = new List<FamilyInstance>();
             string FamilyName = string.Empty;
             RevitPlacmentPoints = RevitPlacmentPoints.Distinct(new ComparePlacmentPoints()).ToList();
+            RevitPlacmentPoints.Sort(delegate (RevitPlacmenElement c1, RevitPlacmenElement c2) { return c1.Station.CompareTo(c2.Station); });
             using (Transaction T = new Transaction(uiDoc.Document, "Place Objects"))
             {
                 T.Start();
@@ -34,18 +35,17 @@ namespace ObjectPlacementLandXml
                     {
                         FamilyInstance FamIns = uiDoc.Document.Create.NewFamilyInstance(RevitPlacmenElement.ConvertPointToInternal(RevitPlacmentPoints[i].PlacementPoint), Fam, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                         RevitPlacmentPoints[i].FillAttributes(FamIns);
-
+                        
                         CreatedInstances.Add(FamIns);
 
 
                         if (i == RevitPlacmentPoints.Count - 1)
                         {
-                            TransformFamilyInstances(FamIns, transform, uiDoc.Document, RevitPlacmentPoints[i], RevitPlacmentPoints[i - 1]);
-
+                            TransformFamilyInstances(CreatedInstances.Last(), transform, uiDoc.Document, RevitPlacmentPoints[i], RevitPlacmentPoints[i - 1]);
                         }
                         else
                         {
-                            TransformFamilyInstances(FamIns, transform, uiDoc.Document, RevitPlacmentPoints[i], RevitPlacmentPoints[i + 1]);
+                            TransformFamilyInstances(CreatedInstances.Last(), transform, uiDoc.Document, RevitPlacmentPoints[i], RevitPlacmentPoints[i + 1]);
                         }
 
                     }
@@ -57,6 +57,15 @@ namespace ObjectPlacementLandXml
                 }
 
                 T.Commit();
+            }
+            using (Transaction T2 = new Transaction(uiDoc.Document, "Transform Elements"))
+            {
+                T2.Start();
+                for (int i = 0; i < length; i++)
+                {
+
+                }
+                T2.Commit();
             }
             return CreatedInstances;
         }
@@ -79,16 +88,14 @@ namespace ObjectPlacementLandXml
             }
             if (transform.RotationAngleInPlane != default(double))
             {
-                XYZ NormalVector = (NextPoint.PlacementPoint - CurrentPoint.PlacementPoint).Normalize();
-                double Angle = (Math.PI / 2) - NormalVector.AngleTo(XYZ.BasisX);
-
-
+                XYZ NormalVector = (CurrentPoint.PlacementPoint - NextPoint.PlacementPoint).Normalize();
+               // double Angle = NormalVector.AngleTo(XYZ.BasisX);
                 Double RotationAngle = UnitUtils.ConvertToInternalUnits(transform.RotationAngleInPlane, DisplayUnitType.DUT_DEGREES_AND_MINUTES);
-                Angle = Angle + RotationAngle;
+               // Angle = Angle + RotationAngle;
                 var Location = (famIns.Location as LocationPoint);
-                var Line = Autodesk.Revit.DB.Line.CreateBound(Location.Point, Location.Point.Add(XYZ.BasisZ));
-               // ElementTransformUtils.RotateElement(document, famIns.Id, Line, Angle);
-                Location.Rotate(Line, RotationAngle);
+                var Line = Autodesk.Revit.DB.Line.CreateBound(NextPoint.PlacementPoint, NextPoint.PlacementPoint.Add(XYZ.BasisZ));
+                ElementTransformUtils.RotateElement(document, famIns.Id, Line, RotationAngle);
+                //Location.Rotate(Line, RotationAngle);
 
             }
             //move Horizontal

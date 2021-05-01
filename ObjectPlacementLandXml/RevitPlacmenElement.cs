@@ -50,45 +50,49 @@ namespace ObjectPlacementLandXml
             {
                 foreach (var Param in ParameterValues.ParamNames)
                 {
-                    try
-                    {
-                        Parameter ParamFou = FamIns.LookupParameter(Param.ParameterName);
-                        if (ParamFou != null && !string.IsNullOrEmpty(Param.ParameterValue))
-                        {
-                            switch (ParamFou.StorageType)
-                            {
-                                case StorageType.None:
-                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
-                                    break;
-                                case StorageType.Integer:
-                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
-                                    break;
-                                case StorageType.Double:
-                                    ParamFou.SetValueString(Param.ParameterValue.ToString());
-                                    break;
-                                case StorageType.String:
-                                    ParamFou.Set(Param.ParameterValue.ToString());
-                                    break;
-                                //case StorageType.ElementId:
-                                //    ParamFou.Set(Station.ToString());
-                                //    break;
-                                default:
-                                    ParamFou.Set(Station.ToString());
-                                    break;
-                            }
-                            
-                            
-                        }
-
-
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
+                    OverrideParamterValue(FamIns, Param);
                 }
                 FamIns.LookupParameter("Text").Set(Station.ToString());
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        private void OverrideParamterValue(FamilyInstance FamIns, ParameterElement Param)
+        {
+            try
+            {
+                Parameter ParamFou = FamIns.LookupParameter(Param.ParameterName);
+                if (ParamFou != null && !string.IsNullOrEmpty(Param.ParameterValue))
+                {
+                    switch (ParamFou.StorageType)
+                    {
+                        case StorageType.None:
+                            ParamFou.SetValueString(Param.ParameterValue.ToString());
+                            break;
+                        case StorageType.Integer:
+                            ParamFou.SetValueString(Param.ParameterValue.ToString());
+                            break;
+                        case StorageType.Double:
+                            ParamFou.SetValueString(Param.ParameterValue.ToString());
+                            break;
+                        case StorageType.String:
+                            ParamFou.Set(Param.ParameterValue.ToString());
+                            break;
+                        //case StorageType.ElementId:
+                        //    ParamFou.Set(Station.ToString());
+                        //    break;
+                        default:
+                            ParamFou.Set(Station.ToString());
+                            break;
+                    }
+
+
+                }
+
+
             }
             catch (Exception)
             {
