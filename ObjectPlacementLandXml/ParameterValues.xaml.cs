@@ -37,6 +37,7 @@ namespace ObjectPlacementLandXml
                     TypeNames.Add(item.Name);
                 }
             }
+            TypeNames.Sort();
             TypesCmb.ItemsSource = TypeNames;
             TypesCmb.SelectedIndex = 0;
 
@@ -47,6 +48,7 @@ namespace ObjectPlacementLandXml
                 ParamNames.Add(new ParameterElement(Famparam.Definition.Name, ""));
             }
             ParamValsDG.ItemsSource = ParamNames;
+
         }
 
         public List<RevitPlacmenElement> RevitPlaceMentPoints { get; }

@@ -35,10 +35,6 @@ namespace ObjectPlacementLandXml
             ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text, TransForm);
             W.ShowDialog();
             //RevitHelper.PlaceRevitFamilies(RevitPlaceMentPoints, uiDoc, FamilyPath.Text);
-            this.Close();
-
-
-
         }
 
         private ElementTransformParams ExtractTransformParameters()
@@ -60,6 +56,7 @@ namespace ObjectPlacementLandXml
             {
                 TransForm.InclinationAngleInXZPlane = double.Parse(this.InclinationTxt.Text);
             }
+            TransForm.RotateWithAlignment = RotateWithAlignment.IsChecked;
             return TransForm;
         }
 

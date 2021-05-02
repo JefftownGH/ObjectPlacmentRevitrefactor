@@ -17,6 +17,6 @@
         public double ElevationFromAlignment { get; set; }
         public double RotationAngleInPlane { get; set; }
         public double InclinationAngleInXZPlane { get; set; }
-
+        public bool? RotateWithAlignment { get; internal set; }
     }
 }

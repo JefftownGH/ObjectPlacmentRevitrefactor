@@ -39,6 +39,7 @@
         <Label Content="To Station" Margin="284,0,408,200" VerticalAlignment="Bottom" RenderTransformOrigin="4.871,-0.231"/>
         <TextBox Margin="141,0,496,203" TextWrapping="Wrap" Text="" x:Name="PlacmentStartStationText" Height="18" VerticalAlignment="Bottom" />
         <TextBox Margin="374,0,263,203" TextWrapping="Wrap" Text="" x:Name="PlacmentEndStationText" Height="18" VerticalAlignment="Bottom" RenderTransformOrigin="0.55,-0.13" />
+        <CheckBox Content="Rotate With Alignment" HorizontalAlignment="Left" Margin="566,63,0,0" VerticalAlignment="Top" Name="RotateWithAlignment"/>
 
         <!--<GroupBox Header="Element Transform" HorizontalAlignment="Left" Height="163" Margin="0,90,0,0" VerticalAlignment="Top" Width="768"/>-->
     </Grid>
