@@ -20,7 +20,7 @@ namespace ObjectPlacementLandXml
     /// </summary>
     public partial class ObjectPlacement : Window
     {
-        public static double Stationincrement { get; set; }
+        public static ElementTransformParams TransForm { get; set; }
         public ObjectPlacement()
         {
             InitializeComponent();
@@ -28,9 +28,9 @@ namespace ObjectPlacementLandXml
 
         private void Run_click(object sender, RoutedEventArgs e)
         {
-            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace());
+           TransForm = ExtractTransformParameters();
+            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text);
 
-            ElementTransformParams TransForm = ExtractTransformParameters();
            
             ParameterValues W = new ParameterValues(RevitPlaceMentPoints, FamilyPath.Text, TransForm);
             W.ShowDialog();
@@ -56,8 +56,13 @@ namespace ObjectPlacementLandXml
             {
                 TransFormParams.InclinationAngleInXZPlane = double.Parse(this.InclinationTxt.Text);
             }
+            if (!string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+            {
+                TransFormParams.DistanceBetweenStations = double.Parse(this.StationDistanceTxt.Text);
+            }
             TransFormParams.RotateWithAlignment = RotateWithAlignment.IsChecked;
-
+            TransFormParams.CreateAlignment = CreateAlignmentInModelCheck.IsChecked;
+            TransFormParams.CreateStationsAtEndAndStartCheck = CreateStationsAtEndAndStartCheck.IsChecked;
 
             TransFormParams.StationToStartFrom = ExtractStationPlacmentStart();
             TransFormParams.StationToEndAt = ExtractStationPlacmentEnd();
@@ -65,16 +70,16 @@ namespace ObjectPlacementLandXml
             return TransFormParams;
         }
 
-        public double ExtractStationDisntace()
-        {
-            if (string.IsNullOrEmpty(this.StationDistanceTxt.Text))
-            {
-                this.StationDistanceTxt.Text = 0.ToString();
-            }
-            Stationincrement = double.Parse(this.StationDistanceTxt.Text);
+        //public double ExtractStationDisntace()
+        //{
+        //    if (string.IsNullOrEmpty(this.StationDistanceTxt.Text))
+        //    {
+        //        this.StationDistanceTxt.Text = 0.ToString();
+        //    }
+        //    Stationincrement = double.Parse(this.StationDistanceTxt.Text);
 
-            return Stationincrement;
-        }
+        //    return Stationincrement;
+        //}
         public double? ExtractStationPlacmentStart()
         {
             double StationPlaceMentStart = default(double);

@@ -11,9 +11,9 @@ namespace ObjectPlacementLandXml
 {
     class RevitHelper
     {
-        internal static List<FamilyInstance> PlaceRevitFamilies(List<RevitPlacmenElement> RevitPlacmentPoints, UIDocument uiDoc, string FamilyPath, string TypeName, ElementTransformParams transform)
+        internal static List<(FamilyInstance, RevitPlacmenElement)> PlaceRevitFamilies(List<RevitPlacmenElement> RevitPlacmentPoints, UIDocument uiDoc, string FamilyPath, string TypeName, ElementTransformParams transform)
         {
-            List<FamilyInstance> CreatedInstances = new List<FamilyInstance>();
+            List<(FamilyInstance,RevitPlacmenElement)> CreatedInstances = new List<(FamilyInstance, RevitPlacmenElement)>();
             string FamilyName = string.Empty;
             RevitPlacmentPoints = RevitPlacmentPoints.Distinct(new ComparePlacmentPoints()).ToList();
             RevitPlacmentPoints.Sort(delegate (RevitPlacmenElement c1, RevitPlacmenElement c2) { return c1.Station.CompareTo(c2.Station); });
@@ -45,7 +45,7 @@ namespace ObjectPlacementLandXml
                         FamilyInstance FamIns = uiDoc.Document.Create.NewFamilyInstance(RevitPlacmenElement.ConvertPointToInternal(RevitPlacmentPoints[i].PlacementPoint), Fam, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                         RevitPlacmentPoints[i].FillAttributes(FamIns);
 
-                        CreatedInstances.Add(FamIns);
+                        CreatedInstances.Add((FamIns, RevitPlacmentPoints[i]));
                     }
 
                 }
@@ -64,21 +64,21 @@ namespace ObjectPlacementLandXml
                 T.Start();
                 for (int i = 0; i < CreatedInstances.Count; i++)
                 {
-                    var ThisLocation = (CreatedInstances[i].Location as LocationPoint).Point;
+                    var ThisLocation = (CreatedInstances[i].Item1.Location as LocationPoint).Point;
 
-                    XYZ NextLocation = GetNextPoint(CreatedInstances, i);
+                  //  XYZ NextLocation = GetNextPoint(CreatedInstances.IndexOf, i);
 
                     Autodesk.Revit.DB.Line NeuRotationLineZ = Autodesk.Revit.DB.Line.CreateUnbound(ThisLocation, XYZ.BasisZ);
 
                     if (transform.RotateWithAlignment == true)
                     {
-                        RotateToAlignment(uiDoc, CreatedInstances, i, ThisLocation, NeuRotationLineZ, NextLocation);
+                        RotateToAlignment(uiDoc, CreatedInstances[i].Item1, NeuRotationLineZ, CreatedInstances[i].Item2.RotationToAlignmentInX);
                     }
 
                     if (transform.RotationAngleInPlane > 0)
                     {
                         Double Angle = UnitUtils.ConvertToInternalUnits(transform.RotationAngleInPlane, DisplayUnitType.DUT_DEGREES_AND_MINUTES);
-                        ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Id, NeuRotationLineZ, Angle);
+                        ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Item1.Id, NeuRotationLineZ, Angle);
                     }
 
                 }
@@ -104,11 +104,12 @@ namespace ObjectPlacementLandXml
             return NextLocation;
         }
 
-        private static void RotateToAlignment(UIDocument uiDoc, List<FamilyInstance> CreatedInstances, int i, XYZ ThisLocation, Autodesk.Revit.DB.Line NeuRotationLineZout, XYZ NextLocation)
+        private static void RotateToAlignment(UIDocument uiDoc, FamilyInstance FamIns, Autodesk.Revit.DB.Line NeuRotationLineZout, double ModifiedAngle)
         {
-            double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
+            (FamIns.Location as LocationPoint).Rotate(NeuRotationLineZout, ModifiedAngle);
+           // double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
             // double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
-            ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Id, NeuRotationLineZout, ModifiedAngle);
+           // ElementTransformUtils.RotateElement(uiDoc.Document, FamIns.Id, NeuRotationLineZout, ModifiedAngle);
         }
 
         private static double ModifyRotationAngle(XYZ CurrentPoint, XYZ NextPoint)

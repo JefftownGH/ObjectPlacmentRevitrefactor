@@ -7,11 +7,13 @@ namespace ObjectPlacementLandXml
     {
         public XYZ PlacementPoint { get; set; }
         public double Station { get; set; }
+        public double RotationToAlignmentInX { get; set; }
 
-        public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment)
+        public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment, double rotationToAlignmentInX)
         {
             PlacementPoint = placementPoint;
             Station = Math.Round(station, 4);
+            RotationToAlignmentInX = rotationToAlignmentInX;
             var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(this.Station, alignment);
             this.PlacementPoint = new XYZ(PlacementPoint.X, PlacementPoint.Y, PointElevation);
         }
@@ -50,7 +52,11 @@ namespace ObjectPlacementLandXml
                 {
                     OverrideParamterValue(FamIns, Param);
                 }
-                FamIns.LookupParameter("Text").Set(Station.ToString());
+                var StationParam = FamIns.LookupParameter("Text");
+                if (StationParam != null)
+                {
+                    StationParam.Set(Station.ToString());
+                }
             }
             catch (Exception)
             {

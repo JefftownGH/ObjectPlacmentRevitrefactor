@@ -22,14 +22,14 @@ namespace ObjectPlacementLandXml
             reader.Close();
             return Schema;
         }
-        internal static List<RevitPlacmenElement> ParseLandXml(string LandXmlPath, double StationIncrement)
+        internal static List<RevitPlacmenElement> ParseLandXml(string LandXmlPath)
         {
             LandXML Landx = Deserialize(LandXmlPath);
-            return ExtractPointPlacment(Landx, StationIncrement);
+            return ExtractPointPlacment(Landx);
 
         }
 
-        private static List<RevitPlacmenElement> ExtractPointPlacment(LandXML Landx, double StationIncrement)
+        private static List<RevitPlacmenElement> ExtractPointPlacment(LandXML Landx)
         {
             List<RevitPlacmenElement> RevitPlacementPoints = new List<RevitPlacmenElement>();
 
@@ -38,16 +38,13 @@ namespace ObjectPlacementLandXml
                 foreach (var Alignment in Alignments.Alignment)
                 {
                     //stationing
-                    List<double> Stations = CreateStationing(StationIncrement, Alignment);
+                    List<double> Stations = CreateStationing(ObjectPlacement.TransForm.DistanceBetweenStations,Alignment);
+                    List<LandXmlStationingObject> LandXmlAlignmentObjects = ExtractStationingObjects(Alignment, Stations);
 
-                    
 
                     LandxmlHeighElements = ExtractHeightElemenets(Alignment);
-
-                    List<LandXmlStationingObject> LandXmlAlignmentObjects = ExtractStartAndEndStationing(Alignment, Stations);
                     //Placment
                     ExtractPlacementPoints(Alignment, RevitPlacementPoints, Stations, LandXmlAlignmentObjects);
-
 
                 }
             }
@@ -220,30 +217,29 @@ namespace ObjectPlacementLandXml
                     for (int i = 0; i < StationsToStudy.Count; i++)
                     {
                         var Station = StationsToStudy[i];
-                        if (Station == LandXmlObject.Station)
+
+                        if (ObjectPlacement.TransForm.CreateStationsAtEndAndStartCheck == false)
                         {
-                            RevitPlacementPoint.Add(LandXmlObject.GetStartPoint());
-                            continue;
+                            if (Station == LandXmlObject.Station && i != 0)
+                            {
+                                continue;
+                            }
+                            if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()) && i != StationsToStudy.Count-1)
+                            {
+                                continue;
+                            }
                         }
-                        //else if (Station == (LandXmlObject.Station + LandXmlObject.GetLength()))
-                        //{
-                        //    RevitPlacementPoint.Add(LandXmlObject.GetEndPoint());
-                        //    continue;
-                        //}
-                        else if (Station > LandXmlObject.Station && Station < (LandXmlObject.Station + LandXmlObject.GetLength()))
+                        if (Station >= LandXmlObject.Station && Station <= (LandXmlObject.Station + LandXmlObject.GetLength()))
                         {
                             var PointAtStatation = LandXmlObject.GetPointAtStation(Station);
                             RevitPlacementPoint.Add(PointAtStatation);
                             continue;
                         }
-                        //else
-                        //{
-                        //    continue;
-                        //}
+                        
                     }
                 }
             }
-            RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
+            //RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
         }
 
         //Stationing 
@@ -259,22 +255,26 @@ namespace ObjectPlacementLandXml
 
             return Stations;
         }
-        private static List<LandXmlStationingObject> ExtractStartAndEndStationing(Alignment Alignment, List<double> Stations)
+        private static List<LandXmlStationingObject> ExtractStationingObjects(Alignment Alignment, List<double> Stations)
         {
             var ObjectStation = Alignment.staStart;
             List<LandXmlStationingObject> Objects = new List<LandXmlStationingObject>();
-
-            foreach (CoordGeom CoordGeom in Alignment.Items.OfType<CoordGeom>())
+            using (Transaction T = new Transaction(Command.uidoc.Document, "Create RevitElements"))
             {
-                foreach (object CoordGeoItem in CoordGeom.Items)
+                T.Start();
+                foreach (CoordGeom CoordGeom in Alignment.Items.OfType<CoordGeom>())
                 {
-                    var LandXmlAlignMentObj = new LandXmlStationingObject(ObjectStation, CoordGeoItem, Alignment);
-                    Objects.Add(LandXmlAlignMentObj);
+                    foreach (object CoordGeoItem in CoordGeom.Items)
+                    {
+                        var LandXmlAlignMentObj = new LandXmlStationingObject(ObjectStation, CoordGeoItem, Alignment);
+                        Objects.Add(LandXmlAlignMentObj);
 
-                    ObjectStation = LandXmlAlignMentObj.GetEndStation();
-                    Stations.Add(ObjectStation);
+                        ObjectStation = LandXmlAlignMentObj.GetEndStation();
+                        Stations.Add(ObjectStation);
+                    }
+
                 }
-
+                T.Commit();
             }
             Stations = Stations.Distinct().ToList();
             return Objects;
