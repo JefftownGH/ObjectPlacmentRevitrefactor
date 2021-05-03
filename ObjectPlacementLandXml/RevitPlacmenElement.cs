@@ -12,9 +12,7 @@ namespace ObjectPlacementLandXml
         {
             PlacementPoint = placementPoint;
             Station = Math.Round(station, 4);
-
             var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(this.Station, alignment);
-
             this.PlacementPoint = new XYZ(PlacementPoint.X, PlacementPoint.Y, PointElevation);
         }
         public static XYZ ConvertPointToInternal(XYZ PointToConvert)

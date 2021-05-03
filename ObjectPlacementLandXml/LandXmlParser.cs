@@ -22,14 +22,14 @@ namespace ObjectPlacementLandXml
             reader.Close();
             return Schema;
         }
-        internal static List<RevitPlacmenElement> ParseLandXml(string LandXmlPath, double StationIncrement, double PlacmentStationStart, double StationPlacementend)
+        internal static List<RevitPlacmenElement> ParseLandXml(string LandXmlPath, double StationIncrement)
         {
             LandXML Landx = Deserialize(LandXmlPath);
-            return ExtractPointPlacment(Landx, StationIncrement, PlacmentStationStart, StationPlacementend);
+            return ExtractPointPlacment(Landx, StationIncrement);
 
         }
 
-        private static List<RevitPlacmenElement> ExtractPointPlacment(LandXML Landx, double StationIncrement, double placmentStationStart, double stationPlacementend)
+        private static List<RevitPlacmenElement> ExtractPointPlacment(LandXML Landx, double StationIncrement)
         {
             List<RevitPlacmenElement> RevitPlacementPoints = new List<RevitPlacmenElement>();
 
@@ -40,21 +40,15 @@ namespace ObjectPlacementLandXml
                     //stationing
                     List<double> Stations = CreateStationing(StationIncrement, Alignment);
 
-                    if (placmentStationStart == default(double))
-                    {
-                        placmentStationStart = Alignment.staStart;
-                    }
-                    if (stationPlacementend == default(double))
-                    {
-                        stationPlacementend = Alignment.length;
-                    }
-                    Stations.RemoveAll(E => E < placmentStationStart || E > stationPlacementend);
+                    
 
                     LandxmlHeighElements = ExtractHeightElemenets(Alignment);
 
                     List<LandXmlStationingObject> LandXmlAlignmentObjects = ExtractStartAndEndStationing(Alignment, Stations);
                     //Placment
-                    ExtractPlacementPoints(Alignment,RevitPlacementPoints, Stations, LandXmlAlignmentObjects);
+                    ExtractPlacementPoints(Alignment, RevitPlacementPoints, Stations, LandXmlAlignmentObjects);
+
+
                 }
             }
 
@@ -214,7 +208,7 @@ namespace ObjectPlacementLandXml
             return LineElement;
         }
 
-        private static void ExtractPlacementPoints(Alignment alignment,List<RevitPlacmenElement> RevitPlacementPoint, List<double> Stations, List<LandXmlStationingObject> LandXmlAlignmentObjects)
+        private static void ExtractPlacementPoints(Alignment alignment, List<RevitPlacmenElement> RevitPlacementPoint, List<double> Stations, List<LandXmlStationingObject> LandXmlAlignmentObjects)
         {
             var StationsToStudy = Stations.Distinct().ToList();
             StationsToStudy.Sort();
@@ -249,7 +243,7 @@ namespace ObjectPlacementLandXml
                     }
                 }
             }
-             RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
+            RevitPlacementPoint.Add(LandXmlAlignmentObjects.Last().GetEndPoint());
         }
 
         //Stationing 

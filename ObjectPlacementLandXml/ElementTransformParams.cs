@@ -18,5 +18,7 @@
         public double RotationAngleInPlane { get; set; }
         public double InclinationAngleInXZPlane { get; set; }
         public bool? RotateWithAlignment { get; internal set; }
+        public double? StationToStartFrom { get; internal set; }
+        public double? StationToEndAt { get; internal set; }
     }
 }

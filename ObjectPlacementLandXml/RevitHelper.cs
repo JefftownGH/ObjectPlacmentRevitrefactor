@@ -31,22 +31,19 @@ namespace ObjectPlacementLandXml
                     FamilySymbol Fam = new FilteredElementCollector(uiDoc.Document).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault(F => F.Name == TypeName && F.FamilyName == FamilyName);
                     Fam.Activate();
 
+                    if (transform.StationToStartFrom != default(double))
+                    {
+                        RevitPlacmentPoints.RemoveAll(E => E.Station < transform.StationToStartFrom);
+                    }
+                    if (transform.StationToEndAt != default(double))
+                    {
+                        RevitPlacmentPoints.RemoveAll(E => E.Station > transform.StationToEndAt);
+                    }
+                    
                     for (int i = 0; i < RevitPlacmentPoints.Count; i++)
                     {
                         FamilyInstance FamIns = uiDoc.Document.Create.NewFamilyInstance(RevitPlacmenElement.ConvertPointToInternal(RevitPlacmentPoints[i].PlacementPoint), Fam, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                         RevitPlacmentPoints[i].FillAttributes(FamIns);
-
-
-                        //if (i < CreatedInstances.Count - 1)
-                        //{
-                        //    NextLocation = (CreatedInstances[i + 1].Location as LocationPoint).Point;
-                        //}
-                        //else
-                        //{
-                        //    NextLocation = (CreatedInstances[i - 1].Location as LocationPoint).Point;
-                        //}
-                        //double ModifiedAngle = ModifyRotationAngle(RevitPlacmentPoints);
-
 
                         CreatedInstances.Add(FamIns);
                     }
@@ -68,18 +65,19 @@ namespace ObjectPlacementLandXml
                 for (int i = 0; i < CreatedInstances.Count; i++)
                 {
                     var ThisLocation = (CreatedInstances[i].Location as LocationPoint).Point;
-                    XYZ NextLocation = null;
-                    
-                   // double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
-                    var NeuRotationLineZ = Autodesk.Revit.DB.Line.CreateUnbound(ThisLocation, XYZ.BasisZ);
-                    //ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Id, NeuRotationLineZ, ModifiedAngle);
+
+                    XYZ NextLocation = GetNextPoint(CreatedInstances, i);
+
+                    Autodesk.Revit.DB.Line NeuRotationLineZ = Autodesk.Revit.DB.Line.CreateUnbound(ThisLocation, XYZ.BasisZ);
+
+                    if (transform.RotateWithAlignment == true)
+                    {
+                        RotateToAlignment(uiDoc, CreatedInstances, i, ThisLocation, NeuRotationLineZ, NextLocation);
+                    }
 
                     if (transform.RotationAngleInPlane > 0)
                     {
                         Double Angle = UnitUtils.ConvertToInternalUnits(transform.RotationAngleInPlane, DisplayUnitType.DUT_DEGREES_AND_MINUTES);
-                        //var LocatioNPoint = (CreatedInstances[i].Location as LocationPoint).Point;
-                        // var RotationAxisZ = Autodesk.Revit.DB.Line.CreateBound(ThisLocation, ThisLocation.Add(new XYZ(ThisLocation.X, ThisLocation.Y, ThisLocation.Z + 100)));
-                        //(CreatedInstances[i].Location as LocationPoint).Rotate(RotationAxisZ, Angle);
                         ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Id, NeuRotationLineZ, Angle);
                     }
 
@@ -90,13 +88,34 @@ namespace ObjectPlacementLandXml
             return CreatedInstances;
         }
 
-        private static double ModifyRotationAngle(List<RevitPlacmenElement> PlacementPoints, int i)
+        private static XYZ GetNextPoint(List<FamilyInstance> CreatedInstances, int i)
         {
-           
+            XYZ NextLocation = null;
 
+            if (i < CreatedInstances.Count - 1)
+            {
+                NextLocation = (CreatedInstances[i + 1].Location as LocationPoint).Point;
+            }
+            else
+            {
+                NextLocation = (CreatedInstances[i - 1].Location as LocationPoint).Point;
+            }
+
+            return NextLocation;
+        }
+
+        private static void RotateToAlignment(UIDocument uiDoc, List<FamilyInstance> CreatedInstances, int i, XYZ ThisLocation, Autodesk.Revit.DB.Line NeuRotationLineZout, XYZ NextLocation)
+        {
+            double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
+            // double ModifiedAngle = ModifyRotationAngle(ThisLocation, NextLocation);
+            ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Id, NeuRotationLineZout, ModifiedAngle);
+        }
+
+        private static double ModifyRotationAngle(XYZ CurrentPoint, XYZ NextPoint)
+        {
             var EndPoint = RevitPlacmenElement.ConvertPointToInternal(NextPoint);
             var StartPoint = RevitPlacmenElement.ConvertPointToInternal(CurrentPoint);
-            XYZ NormalVector = (StartPoint - EndPoint).Normalize();
+            XYZ NormalVector = (EndPoint - CurrentPoint).Normalize();
             double Angle = (Math.PI / 2) - NormalVector.AngleTo(XYZ.BasisX);
             return Angle;
         }

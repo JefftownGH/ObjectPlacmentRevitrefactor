@@ -28,7 +28,7 @@ namespace ObjectPlacementLandXml
 
         private void Run_click(object sender, RoutedEventArgs e)
         {
-            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace(), (double)ExtractStationPlacmentStart(), (double)ExtractStationPlacmentEnd());
+            var RevitPlaceMentPoints = LandXmlParser.ParseLandXml(LandXmlPath.Text, ExtractStationDisntace());
 
             ElementTransformParams TransForm = ExtractTransformParameters();
            
@@ -39,25 +39,30 @@ namespace ObjectPlacementLandXml
 
         private ElementTransformParams ExtractTransformParameters()
         {
-            ElementTransformParams TransForm = new ElementTransformParams();
+            ElementTransformParams TransFormParams = new ElementTransformParams();
             if (!string.IsNullOrEmpty(this.HorizontalDistancetext.Text))
             {
-                TransForm.HorizontalDistance = double.Parse(this.HorizontalDistancetext.Text);
+                TransFormParams.HorizontalDistance = double.Parse(this.HorizontalDistancetext.Text);
             }
             if (!string.IsNullOrEmpty(this.ElevationTxt.Text))
             {
-                TransForm.ElevationFromAlignment = double.Parse(this.ElevationTxt.Text);
+                TransFormParams.ElevationFromAlignment = double.Parse(this.ElevationTxt.Text);
             }
             if (!string.IsNullOrEmpty(this.DegreesTxt.Text))
             {
-                TransForm.RotationAngleInPlane = double.Parse(this.DegreesTxt.Text);
+                TransFormParams.RotationAngleInPlane = double.Parse(this.DegreesTxt.Text);
             }
             if (!string.IsNullOrEmpty(this.InclinationTxt.Text))
             {
-                TransForm.InclinationAngleInXZPlane = double.Parse(this.InclinationTxt.Text);
+                TransFormParams.InclinationAngleInXZPlane = double.Parse(this.InclinationTxt.Text);
             }
-            TransForm.RotateWithAlignment = RotateWithAlignment.IsChecked;
-            return TransForm;
+            TransFormParams.RotateWithAlignment = RotateWithAlignment.IsChecked;
+
+
+            TransFormParams.StationToStartFrom = ExtractStationPlacmentStart();
+            TransFormParams.StationToEndAt = ExtractStationPlacmentEnd();
+            
+            return TransFormParams;
         }
 
         public double ExtractStationDisntace()
@@ -73,10 +78,7 @@ namespace ObjectPlacementLandXml
         public double? ExtractStationPlacmentStart()
         {
             double StationPlaceMentStart = default(double);
-            if (!string.IsNullOrEmpty(this.PlacmentStartStationText.Text))
-            {
-                StationPlaceMentStart = double.Parse(this.PlacmentStartStationText.Text);
-            }
+           
 
             return StationPlaceMentStart;
         }
