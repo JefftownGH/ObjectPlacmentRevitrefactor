@@ -80,6 +80,12 @@ namespace ObjectPlacementLandXml
                         Double Angle = UnitUtils.ConvertToInternalUnits(transform.RotationAngleInPlane, DisplayUnitType.DUT_DEGREES_AND_MINUTES);
                         ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Item1.Id, NeuRotationLineZ, Angle);
                     }
+                    if (transform.ElevationFromAlignment != default(double))
+                    {
+                        double Z = UnitUtils.ConvertToInternalUnits(transform.ElevationFromAlignment, DisplayUnitType.DUT_MILLIMETERS);
+                        ElementTransformUtils.MoveElement(uiDoc.Document, CreatedInstances[i].Item1.Id, new XYZ(0,0,Z));
+
+                    }
 
                 }
 
