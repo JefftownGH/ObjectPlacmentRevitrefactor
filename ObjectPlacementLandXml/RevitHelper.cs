@@ -84,9 +84,22 @@ namespace ObjectPlacementLandXml
                     {
                         double Z = UnitUtils.ConvertToInternalUnits(transform.ElevationFromAlignment, DisplayUnitType.DUT_MILLIMETERS);
                         ElementTransformUtils.MoveElement(uiDoc.Document, CreatedInstances[i].Item1.Id, new XYZ(0,0,Z));
+                    }
+                    if (transform.InclinationAngleInXZPlane != default(double))
+                    {
+                       // double InclinationAngle = UnitUtils.ConvertToInternalUnits(transform.InclinationAngleInXZPlane, DisplayUnitType.DUT_MILLIMETERS);
+                       // ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Item1.Id, CreatedInstances[i].Item2.SimplifiedAlignmentAxis, InclinationAngle);
 
                     }
+                    if (transform.HorizontalDistance != default(double))
+                    {
+                        double HorizontalDistance = UnitUtils.ConvertToInternalUnits(transform.HorizontalDistance, DisplayUnitType.DUT_MILLIMETERS);
 
+                        var NewLocation = new XYZ(0, HorizontalDistance, 0);
+                        ElementTransformUtils.MoveElement(uiDoc.Document, CreatedInstances[i].Item1.Id, NewLocation);
+                       // ElementTransformUtils.RotateElement(uiDoc.Document, CreatedInstances[i].Item1.Id, NeuRotationLineZ, CreatedInstances[i].Item2.RotationToAlignmentInX);
+
+                    }
                 }
 
                 T.Commit();

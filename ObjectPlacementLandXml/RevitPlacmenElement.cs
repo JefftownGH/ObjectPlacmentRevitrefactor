@@ -5,15 +5,18 @@ namespace ObjectPlacementLandXml
 {
     public class RevitPlacmenElement
     {
+
         public XYZ PlacementPoint { get; set; }
         public double Station { get; set; }
         public double RotationToAlignmentInX { get; set; }
+        public Autodesk.Revit.DB.Line SimplifiedAlignmentAxis { get; set; }
 
-        public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment, double rotationToAlignmentInX)
+        public RevitPlacmenElement(XYZ placementPoint, double station, Alignment alignment, double rotationToAlignmentInX, Autodesk.Revit.DB.Line simplifiedAlignmentAxis)
         {
             PlacementPoint = placementPoint;
             Station = Math.Round(station, 4);
             RotationToAlignmentInX = rotationToAlignmentInX;
+            SimplifiedAlignmentAxis = simplifiedAlignmentAxis;
             var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(this.Station, alignment);
             this.PlacementPoint = new XYZ(PlacementPoint.X, PlacementPoint.Y, PointElevation);
         }

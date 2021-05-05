@@ -341,14 +341,12 @@ namespace ObjectPlacementLandXml
             if (this.AlignmentSegmentElement is Line)
             {
                 XYZ Point = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy - Station, false);
-                var TransformAtPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).ComputeDerivatives(StationToStudy - Station, false);
-
-                //review
                 XYZ NextPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy + 0.0001 - Station, false);
+                double AngleToXAxis = ExtractAngleInX(Point, NextPoint);
 
-                double Angle = ExtractAngle(TransformAtPoint, Point, NextPoint);
-
-                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, Angle);
+                XYZ AxisRotationPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Line).Evaluate(StationToStudy + 0.01 - Station, false);
+                var SimplfiedAxis = Autodesk.Revit.DB.Line.CreateBound(Point, AxisRotationPoint);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, AngleToXAxis, SimplfiedAxis);
 
             }
             if (this.AlignmentSegmentElement is IrregularLine)
@@ -365,12 +363,14 @@ namespace ObjectPlacementLandXml
 
                 var NextStationParam = 1 - (((StationToStudy + 0.0001 - this.Station)) / this.GetLength());
                 var NextPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Arc).Evaluate(NextStationParam, true);
-                var TransformAtPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Arc).ComputeDerivatives(StationParam, true);
 
-                double Angle = ExtractAngle(TransformAtPoint, Point, NextPoint);
+                double AngleToXAxis = ExtractAngleInX(Point, NextPoint);
 
+                var AxisStationParam = 1 - (((StationToStudy + 0.01 - this.Station)) / this.GetLength());
+                var AxisRotationPoint = (this.RevitSegmentElement as Autodesk.Revit.DB.Arc).Evaluate(AxisStationParam, true);
+                var SimplfiedAxis = Autodesk.Revit.DB.Line.CreateBound(Point, AxisRotationPoint);
 
-                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, Angle);
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, AngleToXAxis, SimplfiedAxis);
 
             }
             if (this.AlignmentSegmentElement is Spiral)
@@ -381,11 +381,14 @@ namespace ObjectPlacementLandXml
                 double StationParamNext = (StationToStudy + 0.0001 - this.Station) / this.GetLength();
                 XYZ NextPoint = (this.RevitSegmentElement as NurbSpline).Evaluate(StationParamNext, false);
 
-                var TransformAtPoint = (this.RevitSegmentElement as NurbSpline).ComputeDerivatives((StationToStudy - this.Station), false);
-                double Angle = ExtractAngle(TransformAtPoint, Point, NextPoint);
+                double AngleToXAxis = ExtractAngleInX(Point, NextPoint);
 
 
-                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, Angle);
+                double AxisStationParam = (StationToStudy + 0.01 - this.Station) / this.GetLength();
+                XYZ AxisPoint = (this.RevitSegmentElement as NurbSpline).Evaluate(AxisStationParam, false);
+                var SimplfiedAxis = Autodesk.Revit.DB.Line.CreateBound(Point, AxisPoint);
+
+                PointElement = new RevitPlacmenElement(Point, StationToStudy, this.Alignment, AngleToXAxis, SimplfiedAxis);
             }
             if (this.AlignmentSegmentElement is Chain)
             {
@@ -396,25 +399,10 @@ namespace ObjectPlacementLandXml
             return PointElement;
         }
 
-        private double ExtractAngle(Transform CurveTransform, XYZ CurrentPoint, XYZ NextPoint)
+        private double ExtractAngleInX(XYZ CurrentPoint, XYZ NextPoint)
         {
-            if (Station >= 720)
-            {
-
-            }
-
-            // var X = CurveTransform.BasisX;
-            // var X2 = CurveTransform.BasisY;
-            // var X3 = CurveTransform.BasisZ;
-            // var X4 = CurveTransform.Origin;
-            //var X5 = CurveTransform.get_Basis(0);
-            //var X6 = CurveTransform.get_Basis(1);
-            //var X7 = CurveTransform.get_Basis(2);
-
-
-            //XYZ NewPoint = CurveElement.Evaluate((StationToStudy + 0.01 - Station), false);
+         
             XYZ NormalVector = (NextPoint - CurrentPoint).Normalize();
-            //double Angle =NormalVector.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
             if (NextPoint.Y > CurrentPoint.Y )
             {
                 double Angle = NormalVector.AngleTo(XYZ.BasisX) + (Math.PI / 2);
@@ -431,8 +419,6 @@ namespace ObjectPlacementLandXml
                 return Angle;
             }
 
-            //double Angle = NormalVector.AngleTo(XYZ.BasisX);
-            // return Angle;
             return 0;
         }
 
