@@ -8,6 +8,7 @@ namespace ObjectPlacementLandXml
 
         public XYZ PlacementPoint { get; set; }
         public double Station { get; set; }
+        public double TextStation { get; set; }
         public double RotationToAlignmentInX { get; set; }
         public Autodesk.Revit.DB.Line SimplifiedAlignmentAxis { get; set; }
 
@@ -15,6 +16,7 @@ namespace ObjectPlacementLandXml
         {
             PlacementPoint = placementPoint;
             Station = Math.Round(station, 4);
+            TextStation = station;
             RotationToAlignmentInX = rotationToAlignmentInX;
             SimplifiedAlignmentAxis = simplifiedAlignmentAxis;
             var PointElevation = LandXmlStationingObject.ExtractHeightForPoint(this.Station, alignment);
@@ -58,7 +60,7 @@ namespace ObjectPlacementLandXml
                 var StationParam = FamIns.LookupParameter("Text");
                 if (StationParam != null)
                 {
-                    StationParam.Set(Station.ToString());
+                    StationParam.Set(TextStation.ToString());
                 }
             }
             catch (Exception)

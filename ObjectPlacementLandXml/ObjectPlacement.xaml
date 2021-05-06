@@ -9,10 +9,10 @@
     <Grid>
         <Grid.ColumnDefinitions>
         </Grid.ColumnDefinitions>
-        <TextBox Height="24" Margin="287,0,11,152" TextWrapping="Wrap" Text="5" VerticalAlignment="Bottom" Name="StationDistanceTxt"/>
-        <TextBox Height="24" Margin="287,0,11,124" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" Name="HorizontalDistancetext"/>
-        <Label Content="Distance Between Stations : m" Margin="10,0,561,150" Height="26" VerticalAlignment="Bottom"/>
-        <Label Content="Horitzonal Distance : mm" Margin="10,0,561,122" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="287,0,11,139" TextWrapping="Wrap" Text="5" VerticalAlignment="Bottom" Name="StationDistanceTxt"/>
+        <TextBox Height="24" Margin="287,0,11,111" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" Name="HorizontalDistancetext"/>
+        <Label Content="Distance Between Stations : m" Margin="10,0,561,137" Height="26" VerticalAlignment="Bottom"/>
+        <Label Content="Horitzonal Distance : mm" Margin="10,0,561,109" Height="26" VerticalAlignment="Bottom"/>
         <Button Content="Run" Margin="0,0,11,8" Click="Run_click" Height="23" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="217" RenderTransformOrigin="0.513,0.8">
             <Button.RenderTransform>
                 <TransformGroup>
@@ -23,13 +23,13 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <Label Content="Elevation From Alignment : mm" Margin="10,0,561,96" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox Height="24" Margin="287,0,11,95" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="ElevationTxt"/>
+        <Label Content="Elevation From Alignment : mm" Margin="10,0,561,83" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="287,0,11,82" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="ElevationTxt"/>
         <TextBox Margin="141,0,56,226" TextWrapping="Wrap" Text="" x:Name="FamilyPath" Height="18" VerticalAlignment="Bottom" />
         <Button Content="..." Margin="0,0,13,226" Click="RevitBrowserClick" HorizontalAlignment="Right" Width="38" Height="18" VerticalAlignment="Bottom"/>
         <Label Content="Select Family Path" HorizontalAlignment="Left" Margin="10,0,0,217" Width="118" Height="27" VerticalAlignment="Bottom"/>
-        <Label Content="Rotation Angle in Plane: Degrees" Margin="10,0,561,65" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox Height="24" Margin="287,0,11,64" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="DegreesTxt"/>
+        <Label Content="Rotation Angle in Plane: Degrees" Margin="10,0,561,52" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox Height="24" Margin="287,0,11,51" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="DegreesTxt"/>
         <Label Content="Inclination Angle in XZ Plane: Degrees" Margin="10,0,548,34" Height="26" VerticalAlignment="Bottom" Visibility="Hidden"/>
         <TextBox Height="24" Margin="287,0,11,34" TextWrapping="Wrap" Text="0" VerticalAlignment="Bottom" x:Name="InclinationTxt" Visibility="Hidden"/>
         <TextBox Margin="141,0,56,248" TextWrapping="Wrap" Text="" x:Name="LandXmlPath" Height="18" VerticalAlignment="Bottom" />
@@ -39,9 +39,9 @@
         <Label Content="To Station" Margin="284,0,408,200" VerticalAlignment="Bottom" RenderTransformOrigin="4.871,-0.231"/>
         <TextBox Margin="141,0,496,203" TextWrapping="Wrap" Text="" x:Name="PlacmentStartStationText" Height="18" VerticalAlignment="Bottom" />
         <TextBox Margin="374,0,263,203" TextWrapping="Wrap" Text="" x:Name="PlacmentEndStationText" Height="18" VerticalAlignment="Bottom" RenderTransformOrigin="0.55,-0.13" />
-        <CheckBox Content="Rotate With Alignment" HorizontalAlignment="Left" Margin="319,0,0,183" VerticalAlignment="Bottom" Name="RotateWithAlignment"/>
-        <CheckBox Content="Create Alignment in model" HorizontalAlignment="Left" Margin="141,0,0,183" VerticalAlignment="Bottom" x:Name="CreateAlignmentInModelCheck"/>
-        <CheckBox Content="Create Stations At Alignment objects End" HorizontalAlignment="Left" Margin="470,0,0,183" VerticalAlignment="Bottom" x:Name="CreateStationsAtEndAndStartCheck"/>
+        <CheckBox Content="Rotate With Alignment" HorizontalAlignment="Left" Margin="319,0,0,175" VerticalAlignment="Bottom" Name="RotateWithAlignment"/>
+        <CheckBox Content="Create Alignment in model" HorizontalAlignment="Left" Margin="141,0,0,175" VerticalAlignment="Bottom" x:Name="CreateAlignmentInModelCheck"/>
+        <CheckBox Content="Create Stations At Alignment objects End" HorizontalAlignment="Left" Margin="470,0,0,175" VerticalAlignment="Bottom" x:Name="CreateStationsAtEndAndStartCheck"/>
 
         <!--<GroupBox Header="Element Transform" HorizontalAlignment="Left" Height="163" Margin="0,90,0,0" VerticalAlignment="Top" Width="768"/>-->
     </Grid>
